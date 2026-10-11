@@ -451,8 +451,11 @@ if(q('data-ok')||q('data-no')){var ok=!!q('data-ok'),r=DB.cashouts.find(function
 if(x=q('data-t')){if(x.dataset.t)toast(x.dataset.t)}});
 document.addEventListener('keydown',function(e){if(e.key=='Escape')close();if((e.key=='Enter'||e.key==' ')&&e.target.matches('[tabindex]')){e.preventDefault();e.target.click()}});
 document.addEventListener('change',function(e){if(e.target&&e.target.matches('[data-report-month]')){window.pstReportMonth=e.target.value||monthKey();go('reports')}});
-setInterval(function(){document.querySelectorAll('.bay.on .tm').forEach(function(el,k){var on=st.bays.filter(function(b){return b.s=='on'});if(on[k])el.textContent=dur(elapsedSec(on[k]));});if(cur=='dash'){var p=st.per,d=D[p];if(p=='today'){$('pace').innerHTML='On pace for ~ <b>Ksh '+f(Math.max(3550,Math.round(st.rev*1.86/50)*50))+'</b> · '+remainingToday()+' remaining today';}}},1000);
-setInterval(refreshDashboardDate,1000);
+// Dashboard-only timers must not run on the onboarding-only page, whose HTML replaces the dashboard.
+if(!MULTILOUNGE_SETUP_REQUIRED){
+  setInterval(function(){document.querySelectorAll('.bay.on .tm').forEach(function(el,k){var on=st.bays.filter(function(b){return b.s=='on'});if(on[k])el.textContent=dur(elapsedSec(on[k]));});if(cur=='dash'){var p=st.per,d=D[p];if(p=='today'){var paceEl=$('pace');if(paceEl)paceEl.innerHTML='On pace for ~ <b>Ksh '+f(Math.max(3550,Math.round(st.rev*1.86/50)*50))+'</b> · '+remainingToday()+' remaining today';}}},1000);
+  setInterval(refreshDashboardDate,1000);
+}
 var M=function(n){return 'Ksh '+f(n)},S=function(k,key){return DB[k].reduce(function(a,r){return a+(r[key]||0)},0)};
 var BAYS=['Bay 1','Bay 2','Bay 3','Bay 4','Bay 5','Bay 6'];
 var DB={consoles:[['A','PS5'],['B','PS5'],['C','PS5'],['D','PS5'],['E','PS4'],['F','PS4']].map(function(x,i){return {name:x[1]+' · '+x[0],type:x[1],bay:bayName(i)}}),
