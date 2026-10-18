@@ -488,7 +488,8 @@ async function syncBays(){
   var rows=(st.bays||[]).slice(0,6).map(function(b,i){
     var id=bayIds[i]||null;
     if(!id)id=(crypto.randomUUID?crypto.randomUUID():(Date.now().toString(36)+Math.random().toString(36).slice(2)));
-    return {id:id,name:b.name||('Bay '+(i+1)),sort_order:i+1,active:true};
+    var status=b.s||'op';
+    return {id:id,name:b.name||('Bay '+(i+1)),sort_order:i+1,active:true,status:status,game:status==='on'?(b.g||b.det||null):null,detected_game:b.det||null,started_at:status==='on'?(b.startedAt||null):null,extra_seconds:status==='on'?Math.max(0,Math.floor(b.extraSeconds||0)):0,elapsed_seconds:status==='on'?Math.max(0,Math.floor(elapsedSec(b)||0)):0,updated_at:new Date().toISOString()};
   });
   var r=await sb.from('bays').upsert(rows,{onConflict:'id'});
   if(r.error)throw r.error;
@@ -496,6 +497,8 @@ async function syncBays(){
 }
 async function syncDedicated(){ensureIds();for(var z=0;z<CLOUD_TABLES.length;z++){var k=CLOUD_TABLES[z],rows=(DB[k]||[]).map(function(r){return rowForCloud(k,r)});if(rows.length){var rr=await sb.from(k).upsert(rows,{onConflict:'id'});if(rr.error)throw rr.error;}}}
 async function syncCloud(){if(!currentUser||!cloudReady||cloudBusy)return;cloudBusy=true;try{ensureIds();
+  /* Write live bay rows first: these are the cross-device source of truth and must not depend on the broader app_state write succeeding. */
+  await syncBays();
   /* The dedicated shifts table is authoritative for shift status. A closed cloud shift must never be reopened by stale localStorage on another device. New shifts have new IDs and remain eligible to sync. */
   var remoteShiftState=await sb.from('shifts').select('id,status,ended_at');if(remoteShiftState.error)throw remoteShiftState.error;var remoteShiftById={};(remoteShiftState.data||[]).forEach(function(x){remoteShiftById[String(x.id)]=x});(DB.shifts||[]).forEach(function(sh){var rs=sh.id&&remoteShiftById[String(sh.id)];if(rs&&(rs.ended_at||rs.status==='Closed')){sh.ended_at=rs.ended_at||sh.ended_at||null;sh.end=sh.ended_at?nairobiTime(sh.ended_at):(sh.end||'');sh.status='Closed';}else if(sh.ended_at){sh.status='Closed';}});
   /* Before saving the shared app_state, merge the latest cloud bay states for bays this device has not deliberately changed. This prevents a stale tab/device from restoring an old bay status during an unrelated save. */
@@ -519,7 +522,7 @@ var bayStatusDirty={};
 try{var sv=JSON.parse(localStorage.getItem(K)||'null');if(sv){Object.assign(st,sv.st);Object.assign(DB,sv.DB);st.per='today';hydrateBayTimers();ensureIds()}st.lounge=st.lounge||'ECLIPSE GAMING';}catch(_){}
 async function loadDedicated(){
   var b=await sb.from('bays').select('*').order('sort_order');
-  if(b.data&&b.data.length){bayIds=b.data.map(function(x){return x.id});var prior=st.bays||[];st.bays=b.data.slice(0,6).map(function(x,i){return {s:(prior[i]&&prior[i].s)||'op',name:x.name||'Bay '+(i+1),g:prior[i]&&prior[i].g,t:prior[i]&&prior[i].t,startedAt:prior[i]&&prior[i].startedAt,extraSeconds:prior[i]&&prior[i].extraSeconds};});while(st.bays.length<6)st.bays.push({s:'op',name:'Bay '+(st.bays.length+1)});}
+  if(b.data&&b.data.length){bayIds=b.data.map(function(x){return x.id});st.bays=b.data.slice(0,6).map(function(x,i){var status=x.status||'op';return {s:status,name:x.name||('Bay '+(i+1)),g:status==='on'?(x.game||null):null,det:x.detected_game||null,t:Math.max(0,Math.floor(x.elapsed_seconds||0)),startedAt:status==='on'?(x.started_at||null):null,extraSeconds:status==='on'?Math.max(0,Math.floor(x.extra_seconds||0)):0};});while(st.bays.length<6)st.bays.push({s:'op',name:'Bay '+(st.bays.length+1)});}
   var qs=await Promise.all(CLOUD_TABLES.map(function(k){return sb.from(k).select('*').order('created_at',{ascending:true})}));
   if(qs[0].data)DB.games=qs[0].data.map(function(x){return {id:x.id,title:x.title,platform:x.platform,price:+x.price_30_min||0,active:x.active!==false}});
   if(qs[1].data)DB.consoles=qs[1].data.map(function(x){var bi=bayIds.indexOf(x.bay_id);return {id:x.id,name:x.name,type:x.type,bay:bi>=0?bayName(bi):(x.bay||'') ,active:x.active!==false}});
