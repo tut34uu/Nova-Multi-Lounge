@@ -363,7 +363,7 @@ function dlg(h){$('dlg').innerHTML=h;$('mask').classList.add('show')}function cl
 function sessionHistory(){return DB.sessions||[]}
 async function addSession(i,b,amt,pay,customer){if(!DB.sessions)DB.sessions=[];var now=new Date(),tm=now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),game=b.g||b.det||'Unknown',mins=Math.max(1,Math.ceil(elapsedSec(b)/60)),cn=customer||'Walk-in';DB.sessions.unshift({date:localDateKey(now),time:tm,paymentTime:tm,paymentDateTime:now.toISOString(),bay:bayName(i),customer:cn,game:game,minutes:mins,amount:amt,payment:pay});/* Keep attendance/session activity for every staff member currently on shift, but never duplicate collection amounts on individual staff records. */var activeShifts=(DB.shifts||[]).filter(function(sh){return sh.status=='Open'});for(var si=0;si<activeShifts.length;si++){var activeShift=activeShifts[si];activeShift.sessions=(+activeShift.sessions||0)+1;activeShift.updated_at=now.toISOString();if(currentUser&&activeShift.id){var su=await sb.from('shifts').update({sessions:activeShift.sessions}).eq('id',activeShift.id);if(su.error)console.warn('Could not update shift session count:',su.error);}}if(currentUser){var br=bayIds[i]||null;var ins=await sb.from('transactions').insert({bay_id:br,bay_name_snapshot:bayName(i),customer_name:cn,game:game,duration_minutes:mins,amount:amt,payment_method:pay,paid_at:now.toISOString(),created_by:currentUser.id});if(ins.error)toast('Saved locally; cloud sync failed');}save();shiftBox();if(cur=='shifts')go('shifts');}
 function endDialog(i){var b=st.bays[i],mins=Math.max(1,Math.ceil(elapsedSec(b)/60)),amt=billFor(b);dlg('<h3>End '+(i+1)+' · '+(b.g||'Session')+'</h3><p>Edit the duration and amount before recording the payment.</p><label>Duration (minutes)<input id="duration" type="number" min="1" step="1" value="'+mins+'"></label><label>Amount (Ksh)<input id="sessionAmount" type="number" min="0" step="1" value="'+amt+'"></label><label>Customer name (optional)<input id="customer" placeholder="Walk-in"></label><div class="choice"><button data-pay="Cash" data-end2="'+i+'">Cash</button><button data-pay="M-Pesa" data-end2="'+i+'">M-Pesa</button><button data-pay="Credit" data-end2="'+i+'">Credit</button><button data-pay="Bank Till" data-end2="'+i+'">Bank Till</button></div><button class="cx" data-x>Cancel</button>')}
-function pick(i){var b=st.bays[i],n=bayName(i);if(b.s=='on'){endDialog(i);return}var savedGames=(DB.games||[]).filter(function(g){return g&&g.active!==false&&g.title});var names=savedGames.map(function(g){return g.title});if(b.det&&names.indexOf(b.det)<0)names.unshift(b.det);if(!names.length)names=['No games saved'];dlg('<h3>'+(b.s=='un'?'Log session for '+n:'Start session on '+n)+'</h3><p>Pick the game being played</p>'+names.map(function(g){return '<button data-go="'+i+'" data-g="'+String(g).replace(/"/g,'&quot;')+'">'+String(g).replace(/</g,'&lt;')+'</button>'}).join('')+'<button class="cx" data-x>Cancel</button>')}
+function pick(i){if(currentUser&&(!Number.isInteger(i)||i<0||i>=paidBayLimit||!st.bays[i])){toast('This bay is not included in the active subscription. Upgrade the subscription to use more bays.');return}var b=st.bays[i],n=bayName(i);if(!b){toast('This bay is unavailable.');return}if(b.s=='on'){endDialog(i);return}var savedGames=(DB.games||[]).filter(function(g){return g&&g.active!==false&&g.title});var names=savedGames.map(function(g){return g.title});if(b.det&&names.indexOf(b.det)<0)names.unshift(b.det);if(!names.length)names=['No games saved'];dlg('<h3>'+(b.s=='un'?'Log session for '+n:'Start session on '+n)+'</h3><p>Pick the game being played</p>'+names.map(function(g){return '<button data-go="'+i+'" data-g="'+String(g).replace(/"/g,'&quot;')+'">'+String(g).replace(/</g,'&lt;')+'</button>'}).join('')+'<button class="cx" data-x>Cancel</button>')}
 document.addEventListener('click',function(e){var b=e.target&&e.target.closest?e.target.closest('[data-report-tab]'):null;if(!b)return;e.preventDefault();e.stopImmediatePropagation();window.reportTab=b.dataset.reportTab||'overview';try{go('reports')}catch(err){console.error('Could not open Nova report tab:',err);toast('Report error: '+String(err&&err.message||err||'unknown error').slice(0,115))}},true);
 document.addEventListener('click',function(e){var t=e.target,q=function(s){return t.closest('['+s+']')},x;
 if(q('data-new-tournament')){novaTournamentForm();return}
@@ -440,7 +440,7 @@ if(x=q('data-quick')){var z=x.dataset.quick;if(z=='start'){var oi=st.bays.findIn
 if(x=q('data-p')){st.per=x.dataset.p;[].forEach.call($('tabs').children,function(c){c.classList.toggle('on',c==x)});stats();return}
 if(x=q('data-b')){pick(+x.dataset.b);return}
 if(q('data-inv')){pick(st.bays.findIndex(function(b){return b.s=='un'}));return}
-if(x=q('data-go')){var i=+x.dataset.go;bayStatusDirty[i]=true;if(st.bays[i].s=='op')st.sess++;st.bays[i]={s:'on',name:bayName(i),g:x.dataset.g,t:0,startedAt:new Date().toISOString(),extraSeconds:0};close();all();toast(bayName(i)+' is now billed · '+x.dataset.g);return}
+if(x=q('data-go')){var i=+x.dataset.go;if(currentUser&&(!Number.isInteger(i)||i<0||i>=paidBayLimit||!st.bays[i])){close();toast('This bay is not included in the active subscription.');return}if(!st.bays[i]){close();toast('This bay is unavailable.');return}bayStatusDirty[i]=true;if(st.bays[i].s=='op')st.sess++;st.bays[i]={s:'on',name:bayName(i),g:x.dataset.g,t:0,startedAt:new Date().toISOString(),extraSeconds:0};close();all();toast(bayName(i)+' is now billed · '+x.dataset.g);return}
 if(x=q('data-start')){pick(+x.dataset.start);return}
 if(x=q('data-time')){var tb=st.bays[+x.dataset.time];if(tb&&tb.s=='on'){tb.extraSeconds=(tb.extraSeconds||0)+1800;tb.t=elapsedSec(tb);save();bays();toast('30 minutes added');}return}
 if(x=q('data-bill')){var bi=+x.dataset.bill;if(st.bays[bi].s=='on')endDialog(bi);else pick(bi);return}
@@ -488,17 +488,59 @@ function rowForCloud(k,r){
 }
 async function syncBays(){
   if(!currentUser)return;
-  if(!paidBayLimit)return;
   var loungeId=(currentUser.app_metadata||{}).active_lounge_id;
   if(!loungeId)throw new Error('This account is not assigned to an active lounge. Sign out and sign in again.');
-  var rows=(st.bays||[]).slice(0,paidBayLimit).map(function(b,i){
-    var id=bayIds[i]||null;
+
+  // Always read this lounge's bay records only. Reuse existing inactive rows
+  // when a subscription is upgraded instead of creating duplicate bays.
+  var existingResult=await sb.from('bays')
+    .select('id,lounge_id,name,sort_order,active')
+    .eq('lounge_id',loungeId)
+    .order('sort_order',{ascending:true});
+  if(existingResult.error)throw existingResult.error;
+  var existing=existingResult.data||[];
+  var targetCount=Math.max(0,Math.min(30,Math.floor(Number(paidBayLimit)||0)));
+
+  if(targetCount===0){
+    for(var z=0;z<existing.length;z++){
+      if(existing[z].active!==false){
+        var disableResult=await sb.from('bays').update({active:false,updated_at:new Date().toISOString()})
+          .eq('lounge_id',loungeId).eq('id',existing[z].id);
+        if(disableResult.error)throw disableResult.error;
+      }
+    }
+    bayIds=[];
+    st.bays=[];
+    return;
+  }
+
+  var rows=[];
+  for(var i=0;i<targetCount;i++){
+    var existingBay=existing[i]||null;
+    var localBay=(st.bays||[])[i]||{};
+    var id=existingBay&&existingBay.id;
     if(!id)id=(crypto.randomUUID?crypto.randomUUID():(Date.now().toString(36)+Math.random().toString(36).slice(2)));
-    return {id:id,lounge_id:loungeId,name:b.name||('Bay '+(i+1)),sort_order:i+1,active:true};
-  });
-  var r=await sb.from('bays').upsert(rows,{onConflict:'id'});
-  if(r.error)throw r.error;
-  bayIds=rows.map(function(x){return x.id});
+    rows.push({
+      id:id,
+      lounge_id:loungeId,
+      name:(existingBay&&existingBay.name)||('Bay '+(i+1)),
+      sort_order:i+1,
+      active:true
+    });
+  }
+
+  var upsertResult=await sb.from('bays').upsert(rows,{onConflict:'id'});
+  if(upsertResult.error)throw upsertResult.error;
+
+  var keep={};rows.forEach(function(row){keep[String(row.id)]=true;});
+  for(var j=0;j<existing.length;j++){
+    if(!keep[String(existing[j].id)]&&existing[j].active!==false){
+      var inactiveResult=await sb.from('bays').update({active:false,updated_at:new Date().toISOString()})
+        .eq('lounge_id',loungeId).eq('id',existing[j].id);
+      if(inactiveResult.error)throw inactiveResult.error;
+    }
+  }
+  bayIds=rows.map(function(row){return row.id;});
 }
 async function syncDedicated(){ensureIds();for(var z=0;z<CLOUD_TABLES.length;z++){var k=CLOUD_TABLES[z],rows=(DB[k]||[]).map(function(r){return rowForCloud(k,r)});if(rows.length){var rr=await sb.from(k).upsert(rows,{onConflict:'id'});if(rr.error)throw rr.error;}}}
 async function syncCloud(){if(!currentUser||!cloudReady||cloudBusy)return;cloudBusy=true;try{ensureIds();
@@ -524,9 +566,33 @@ var bayIds=[];
 var bayStatusDirty={};
 try{var sv=JSON.parse(localStorage.getItem(K)||'null');if(sv){Object.assign(st,sv.st);Object.assign(DB,sv.DB);st.per='today';hydrateBayTimers();ensureIds()}st.lounge=st.lounge||'ECLIPSE GAMING';}catch(_){}
 async function loadDedicated(){
-  var b=await sb.from('bays').select('*').order('sort_order');
-  var entitlementCount=Math.max(0,Math.min(30,paidBayLimit||0));
-  if(b.data&&b.data.length){var visible=b.data.slice(0,entitlementCount);bayIds=visible.map(function(x){return x.id});var prior=st.bays||[];st.bays=visible.map(function(x,i){return {s:(prior[i]&&prior[i].s)||'op',name:x.name||'Bay '+(i+1),g:prior[i]&&prior[i].g,t:prior[i]&&prior[i].t,startedAt:prior[i]&&prior[i].startedAt,extraSeconds:prior[i]&&prior[i].extraSeconds};});while(st.bays.length<entitlementCount)st.bays.push({s:'op',name:'Bay '+(st.bays.length+1)});}else{st.bays=(st.bays||[]).slice(0,entitlementCount);while(st.bays.length<entitlementCount)st.bays.push({s:'op',name:'Bay '+(st.bays.length+1)});}
+  var loungeId=(currentUser&&currentUser.app_metadata||{}).active_lounge_id;
+  var entitlementCount=Math.max(0,Math.min(30,Math.floor(Number(paidBayLimit)||0)));
+  if(!loungeId||entitlementCount===0){
+    bayIds=[];
+    st.bays=[];
+  }else{
+    // Do not load bays belonging to other lounges. Only active records within
+    // the paid entitlement are available in the owner or staff dashboard.
+    var b=await sb.from('bays').select('*')
+      .eq('lounge_id',loungeId)
+      .order('sort_order',{ascending:true});
+    if(b.error)throw b.error;
+    var activeRows=(b.data||[]).filter(function(row){return row.active===true;}).slice(0,entitlementCount);
+    bayIds=activeRows.map(function(row){return row.id;});
+    var prior=st.bays||[];
+    st.bays=activeRows.map(function(row,i){
+      return {
+        s:(prior[i]&&prior[i].s)||'op',
+        name:row.name||'Bay '+(i+1),
+        g:prior[i]&&prior[i].g,
+        det:prior[i]&&prior[i].det,
+        t:prior[i]&&prior[i].t,
+        startedAt:prior[i]&&prior[i].startedAt,
+        extraSeconds:prior[i]&&prior[i].extraSeconds
+      };
+    });
+  }
   var qs=await Promise.all(CLOUD_TABLES.map(function(k){return sb.from(k).select('*').order('created_at',{ascending:true})}));
   if(qs[0].data)DB.games=qs[0].data.map(function(x){return {id:x.id,title:x.title,platform:x.platform,price:+x.price_30_min||0,active:x.active!==false}});
   if(qs[1].data)DB.consoles=qs[1].data.map(function(x){var bi=bayIds.indexOf(x.bay_id);return {id:x.id,name:x.name,type:x.type,bay:bi>=0?bayName(bi):(x.bay||'') ,active:x.active!==false}});
@@ -589,12 +655,12 @@ async function upgradeBays(){
     toast('Payment prompt sent. Extra bays stay locked until payment is confirmed.');
     var end=Date.now()+120000,updated=false;
     while(Date.now()<end){await new Promise(function(resolve){setTimeout(resolve,4000)});await loadSubscriptionEntitlement();if(paidBayLimit>=desired){updated=true;break;}}
-    if(updated){await loadDedicated();all();toast('Upgrade confirmed. '+paidBayLimit+' bays are now available.');}
+    if(updated){if(['owner','admin'].includes(loungeRole))await syncBays();await loadDedicated();all();toast('Upgrade confirmed. '+paidBayLimit+' bays are now available.');}
     else toast('Payment is still being verified. Refresh in a moment; bays unlock only after confirmation.');
   }catch(e){console.error('Bay upgrade:',e);toast(e.message||'Could not request the upgrade payment.');}
   finally{if(btn){btn.disabled=false;btn.textContent='＋ Add bays / Upgrade';}}
 }
-async function loadCloud(){if(!currentUser)return;cloudReady=false;var loaded=false;try{await loadSubscriptionEntitlement();var state=await sb.from('app_state').select('state').eq('id',1).maybeSingle();if(state.error)throw state.error;if(state.data&&state.data.state){Object.assign(st,state.data.state.st||{});Object.assign(DB,state.data.state.DB||{});st.per='today';hydrateBayTimers();ensureIds();}await loadDedicated();if(bayIds.length<paidBayLimit)await syncBays();await loadBusinessSettings();st.lounge=st.lounge||'ECLIPSE GAMING';loaded=true;}catch(e){console.warn('Cloud load:',e);toast('Could not fully load cloud data. Local changes will not be synced until cloud loading succeeds.')}cloudReady=loaded;all();subscribeRealtime();if(loaded)retryPendingLoungeSettings();}
+async function loadCloud(){if(!currentUser)return;cloudReady=false;var loaded=false;try{await loadSubscriptionEntitlement();var state=await sb.from('app_state').select('state').eq('id',1).maybeSingle();if(state.error)throw state.error;if(state.data&&state.data.state){Object.assign(st,state.data.state.st||{});Object.assign(DB,state.data.state.DB||{});st.per='today';hydrateBayTimers();ensureIds();}if(['owner','admin'].includes(loungeRole))await syncBays();await loadDedicated();await loadBusinessSettings();st.lounge=st.lounge||'ECLIPSE GAMING';loaded=true;}catch(e){console.warn('Cloud load:',e);toast('Could not fully load cloud data. Local changes will not be synced until cloud loading succeeds.')}cloudReady=loaded;all();subscribeRealtime();if(loaded)retryPendingLoungeSettings();}
 function subscribeRealtime(){if(!currentUser||window.psTallyChannel)return;window.psTallyChannel=sb.channel('pstally-live').on('postgres_changes',{event:'*',schema:'public',table:'bays'},function(){refreshDedicated()}).on('postgres_changes',{event:'*',schema:'public',table:'transactions'},function(){refreshDedicated()}).on('postgres_changes',{event:'*',schema:'public',table:'games'},function(){refreshDedicated()}).on('postgres_changes',{event:'*',schema:'public',table:'consoles'},function(){refreshDedicated()}).on('postgres_changes',{event:'*',schema:'public',table:'staff'},function(){refreshDedicated()}).on('postgres_changes',{event:'*',schema:'public',table:'shifts'},function(){refreshDedicated()}).on('postgres_changes',{event:'*',schema:'public',table:'debts'},function(){refreshDedicated()}).on('postgres_changes',{event:'*',schema:'public',table:'products'},function(){refreshDedicated()}).on('postgres_changes',{event:'*',schema:'public',table:'income'},function(){refreshDedicated()}).on('postgres_changes',{event:'*',schema:'public',table:'tournaments'},function(){refreshDedicated()}).on('postgres_changes',{event:'*',schema:'public',table:'monthly_closings'},function(){refreshDedicated()}).on('postgres_changes',{event:'*',schema:'public',table:'monthly_inventory_snapshots'},function(){refreshDedicated()}).on('postgres_changes',{event:'*',schema:'public',table:'inventory_movements'},function(){refreshDedicated()}).on('postgres_changes',{event:'*',schema:'public',table:'debt_payments'},function(){refreshDedicated()}).on('postgres_changes',{event:'*',schema:'public',table:'report_audit_events'},function(){refreshDedicated()}).on('postgres_changes',{event:'*',schema:'public',table:'business_settings'},async function(){await loadBusinessSettings();all();}).on('postgres_changes',{event:'*',schema:'public',table:'app_state'},async function(payload){try{var z=payload&&payload.new&&payload.new.state;if(z&&z.st){if(z.st.lounge)st.lounge=z.st.lounge;if(z.st.rate!=null)st.rate=+z.st.rate||st.rate;/* Merge remote bay status without calling all(), which saves and can overwrite a newer close with stale local state. */if(Array.isArray(z.st.bays)&&z.st.bays.length){st.bays=z.st.bays.slice(0,paidBayLimit).map(function(rb,i){var local=st.bays[i]||{};if(bayStatusDirty[i])return local;return Object.assign({},local,rb,{name:rb.name||local.name||('Bay '+(i+1))});});while(st.bays.length<paidBayLimit)st.bays.push({s:'op',name:'Bay '+(st.bays.length+1)});}if($('dt'))$('dt').textContent=displayDate()+' · '+(st.lounge||'ECLIPSE GAMING');bays();stats();}}catch(e){console.warn('Settings realtime:',e)}}).subscribe();}
 async function refreshDedicated(){if(!currentUser||cloudBusy)return;try{await loadDedicated();cloudReady=true;localStorage.setItem(K,JSON.stringify({st:st,DB:DB}));all();if(cur!='dash')go(cur)}catch(e){console.warn('Realtime refresh:',e)}}
 
