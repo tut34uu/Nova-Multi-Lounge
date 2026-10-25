@@ -306,7 +306,21 @@ function renderPayments(){
 
 function applyPayFilter(){const v=state.payFilter;document.querySelectorAll('#content tbody tr[data-pstatus]').forEach(tr=>{tr.style.display=(v==='all'||tr.dataset.pstatus===v)?'':'none';});}
 async function callReview(paymentId,decision,note){
- const {data,error}=await sb.functions.invoke('review-payment',{body:{payment_id:paymentId,decision,admin_note:note||null}});
+ // Ensure the Edge Function receives a current, valid Supabase access token.
+ let sessionResult=await sb.auth.getSession();
+ if(sessionResult.error)throw new Error('Could not verify your admin session: '+fmtError(sessionResult.error));
+ let session=sessionResult.data?.session||null;
+ const nearExpiry=!session?.access_token||!session?.expires_at||(Number(session.expires_at)*1000-Date.now()<90_000);
+ if(nearExpiry){
+  const refreshed=await sb.auth.refreshSession();
+  if(refreshed.error)throw new Error('Your admin session has expired. Please sign out and sign in again. ('+fmtError(refreshed.error)+')');
+  session=refreshed.data?.session||null;
+ }
+ if(!session?.access_token)throw new Error('Your admin session is missing or expired. Please sign out and sign in again.');
+ const {data,error}=await sb.functions.invoke('review-payment',{
+  body:{payment_id:paymentId,decision,admin_note:note||null},
+  headers:{Authorization:'Bearer '+session.access_token}
+ });
  if(error){let msg=fmtError(error);try{const raw=await error.context.text();try{const j=JSON.parse(raw);msg=j.error||j.message||raw}catch{msg=raw||msg}}catch{}throw new Error(msg);}
  if(data?.error)throw new Error(data.error);
  return data||{};
@@ -348,7 +362,7 @@ function openPaymentReview(id){
 /* Admin safety: sign out after 30 minutes without activity, and keep the queue fresh. */
 let lastActivity=Date.now();const IDLE_MS=30*60*1000;
 ['click','keydown','pointerdown','touchstart','scroll'].forEach(ev=>document.addEventListener(ev,()=>{lastActivity=Date.now();},{passive:true}));
-setInterval(async()=>{if(!state.user||!sb)return;if(Date.now()-lastActivity>IDLE_MS){try{await sb.auth.signOut();}catch{}state.user=null;closeLoungeProfile();showLogin('You were signed out after 30 minutes of inactivity.');return;}if(!document.hidden){if(!state.loading)loadAll(true);supportTick();}},60000);
+setInterval(async()=>{if(!state.user||!sb)return;if(Date.now()-lastActivity>IDLE_MS){try{await sb.auth.signOut();}catch{}state.user=null;closeLoungeProfile();showLogin('You were signed out after 30 minutes of inactivity.');return;}if(!document.hidden){if(!state.loading)loadAll(true);supportTick();}},10000);
 
 /* ---------- Support inbox (live chat with lounges) ---------- */
 function hhmm(iso){try{return new Date(iso).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}catch{return ''}}
