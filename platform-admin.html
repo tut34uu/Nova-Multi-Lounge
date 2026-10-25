@@ -140,7 +140,7 @@ tr[data-pstatus="pending"] td:first-child{box-shadow:inset 3px 0 0 var(--amber)}
  <div class="sidebottom"><strong>Nova Platform Admin</strong><span id="adminEmail">—</span><br><span class="muted">Connected to Nova production project</span></div>
 </aside>
 <main>
- <header class="top"><button class="btn mobilemenu" id="menuBtn">☰</button><div class="search">⌕ <input id="globalSearch" placeholder="Search lounges, IDs, payment references…" aria-label="Search"></div><div class="righttop"><span id="lastUpdated">Not refreshed yet</span><div class="avatar">NA</div><span id="topEmail">Admin</span><button class="btn" id="themeToggle" type="button" aria-label="Switch to light mode" title="Switch theme">☀ Light mode</button><button class="btn" id="refreshBtn" type="button" aria-label="Refresh admin dashboard data">↻ Refresh</button></div></header>
+ <header class="top"><button class="btn mobilemenu" id="menuBtn">☰</button><div class="search">⌕ <input id="globalSearch" placeholder="Search lounges, IDs, payment references…" aria-label="Search"></div><div class="righttop"><span id="lastUpdated">Not refreshed yet</span><div class="avatar">NA</div><span id="topEmail">Admin</span><button class="btn" id="themeToggle" type="button" aria-label="Switch to light mode" title="Switch theme">☀ Light mode</button><button class="btn" id="enableAllAlerts" type="button" title="Enable sound and desktop alerts for messages, payments and approvals">🔔 Enable alerts</button><button class="btn" id="refreshBtn" type="button" aria-label="Refresh admin dashboard data">↻ Refresh</button></div></header>
  <section class="pagehead"><div><h1 id="pageTitle">Platform overview</h1><p id="pageSubtitle">Your business at a glance. Metrics are loaded from the live Nova database.</p></div><div class="actions"><select class="field" id="dateRange" aria-label="Date range"><option value="30">Last 30 days</option><option value="7">Last 7 days</option><option value="90">Last 90 days</option><option value="365">Last 12 months</option><option value="all">All time</option></select><button class="btn" id="exportBtn">↓ Export CSV</button></div></section>
  <div id="warning" class="notice hidden"></div>
  <div id="content"></div>
@@ -155,7 +155,7 @@ const SUPABASE_URL='https://sixtpaitbpnuiquyyxsp.supabase.co';
 const SUPABASE_KEY='sb_publishable_gaSQMZvErbkv1L8051amZg_cptbzH4K';
 const sb=window.supabase?.createClient ? window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY) : null;
 const $=id=>document.getElementById(id);
-const state={support:{convos:[],sel:null,msgs:[],filter:'open',draft:'',err:'',loaded:false,started:false,unread:0,seen:{},sending:false,at:0},payFilter:'all',prevPending:null,user:null,page:'overview',lounges:[],subs:[],payments:[],mpesa:[],errors:[],search:'',range:'30',loading:false};
+const state={support:{convos:[],sel:null,msgs:[],filter:'open',draft:'',err:'',loaded:false,started:false,unread:0,seen:{},sending:false,at:0},payFilter:'all',prevPending:null,user:null,page:'overview',lounges:[],subs:[],payments:[],mpesa:[],errors:[],search:'',range:'30',loading:false,paymentNotifySnapshot:null};
 const titles={overview:['Platform overview','Your business at a glance. Metrics are loaded from the live Nova database.'],support:['Support inbox','Live chats from lounge owners and staff. Reply here and they see it instantly.'],payments:['Payments & approvals','Review manual payment submissions and monitor M-Pesa request statuses.'],lounges:['Lounges & customers','Every registered lounge and its current platform status.'],subscriptions:['Subscriptions','Entitlements, expiry dates and console counts.'],analytics:['Business analytics','Revenue, customer growth and subscription health.'],reports:['Reports','Export filtered platform data for your business records.'],audit:['Audit & activity','Recent payment and subscription activity visible to this admin account.'],settings:['Platform settings','Secure platform administration and integration health.']};
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function money(v){return 'KSh '+Number(v||0).toLocaleString('en-KE',{maximumFractionDigits:2});}
@@ -177,6 +177,8 @@ async function enableMessageNotifications(){
 function notifyIncomingMessage(message,conversation){
  const who=conversation?.lounge_name||message?.sender_name||'Client';
  const body=String(message?.body||'New support message');
+ // Always sound for a newly received client message, even when the admin is on another tab/page.
+ playNovaMessageSound();
  toast('New message from '+who+': '+body.slice(0,100));
  if('Notification' in window&&Notification.permission==='granted'){
   try{
@@ -184,6 +186,25 @@ function notifyIncomingMessage(message,conversation){
    n.onclick=()=>{window.focus();state.page='support';render();if(message?.conversation_id)openSupportConvo(message.conversation_id);n.close();};
   }catch(e){console.warn('Desktop notification:',e);}
  }
+}
+const novaAdminNotifiedEvents=new Set();
+function notifyAdminBilling(title,body,tag){
+ const eventTag=tag||('nova-billing-'+title+'-'+body);
+ // Realtime and refresh polling can see the same event; notify only once per event in this page session.
+ if(novaAdminNotifiedEvents.has(eventTag))return;
+ novaAdminNotifiedEvents.add(eventTag);
+ playNovaMessageSound();toast(title+' — '+body);
+ if('Notification' in window&&Notification.permission==='granted'){
+  try{const n=new Notification('Nova · '+title,{body,tag:eventTag,renotify:true});n.onclick=()=>{window.focus();state.page='payments';render();n.close();};}
+  catch(e){console.warn('Billing notification:',e);}
+ }
+}
+async function enableAllNovaAlerts(button){
+ const sound=enableNovaSound();const desktop=await enableMessageNotifications();
+ if(button)button.textContent=sound?'🔔 Alerts on':'🔔 Enable alerts';
+ if(sound&&desktop)toast('Sound and desktop alerts enabled for messages, payments and approvals.');
+ else if(sound)toast('Sound enabled. Allow browser notifications in site settings for desktop alerts.');
+ else toast('Could not start sound. Check browser permissions and device volume.');
 }
 function warn(s){$('warning').textContent=s;$('warning').classList.toggle('hidden',!s);}
 function fmtError(e){return e?.message||String(e||'Unknown error');}
@@ -203,6 +224,7 @@ async function enter(user){
 }
 $('loginForm').addEventListener('submit',async e=>{e.preventDefault();const btn=$('loginBtn');btn.disabled=true;$('loginError').textContent='';try{if(!sb)throw new Error('The Supabase sign-in library did not load. Check your internet connection, disable any script blocker for this page, then refresh.');$('loginError').textContent='Signing in…';const {data,error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)throw error;if(!data?.user)throw new Error('Sign-in returned no user. Please try again.');await enter(data.user);}catch(e){$('loginError').textContent=fmtError(e);}finally{btn.disabled=false;}});
 $('signOutBtn').addEventListener('click',async()=>{await sb.auth.signOut();state.user=null;showLogin('You have signed out.');});
+$('enableAllAlerts')?.addEventListener('click',()=>enableAllNovaAlerts($('enableAllAlerts')));if(novaSoundEnabled&&$('enableAllAlerts'))$('enableAllAlerts').textContent='🔔 Alerts on';
 if(sb)sb.auth.onAuthStateChange((_event,session)=>{if(!session){state.user=null;showLogin();}});
 if(!sb){showLogin('Sign-in could not initialize because the Supabase library did not load. Check internet access and refresh this page.');}
 async function safeQuery(label,query){try{const {data,error}=await query;if(error)throw error;return data||[];}catch(e){state.errors.push(label+': '+fmtError(e));return [];}}
@@ -218,6 +240,15 @@ async function loadAll(quiet,force=false){
  const results=await Promise.all([safeQuery('Lounges',lq),safeQuery('Subscriptions',sq),safeQuery('Payment submissions',pq),safeQuery('M-Pesa requests',mq),safeQuery('Pending payments',pendq)]);
  [state.lounges,state.subs,state.payments,state.mpesa]=results;
  { const seen=new Set(state.payments.map(p=>p.id));for(const p of results[4])if(!seen.has(p.id))state.payments.push(p);state.payments.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)); }
+ { const snap={};state.payments.forEach(p=>{if(p.id)snap[p.id]={status:String(p.status||'').toLowerCase(),created_at:p.created_at};});
+   if(state.paymentNotifySnapshot){
+    for(const p of state.payments){if(!p.id)continue;const old=state.paymentNotifySnapshot[p.id],now=String(p.status||'').toLowerCase();
+     if(!old&&now==='pending')notifyAdminBilling('New payment submitted',(getLounge(p.lounge_id)?.name||'A lounge')+' submitted '+money(p.amount_kes)+' for review.','nova-payment-'+p.id);
+     else if(old&&old.status!==now&&['approved','rejected','paid','success','completed'].includes(now))notifyAdminBilling(now==='rejected'?'Payment rejected':'Payment approved',(getLounge(p.lounge_id)?.name||'A lounge')+' payment is now '+now+'.','nova-payment-status-'+p.id);
+    }
+   }
+   state.paymentNotifySnapshot=snap;
+ }
  state.loading=false;$('lastUpdated').textContent='Updated '+new Date().toLocaleTimeString('en-KE',{hour:'2-digit',minute:'2-digit'});
  {const pc=state.payments.filter(p=>String(p.status).toLowerCase()==='pending').length;$('pendingBadge').textContent=pc;state.pendingCount=pc;refreshTitle();if(state.prevPending!==null&&pc>state.prevPending)toast('New payment waiting for review.');state.prevPending=pc;}
  if(state.errors.length)warn('Some live data could not be loaded. This is usually caused by a missing table, column, or Row Level Security permission. '+state.errors.join(' · '));
@@ -365,7 +396,28 @@ function startSupport(){
    })
    .on('postgres_changes',{event:'*',schema:'public',table:'support_conversations'},()=>{clearTimeout(supportReloadTimer);supportReloadTimer=setTimeout(()=>loadSupportList(true),350);})
    .subscribe();
- }catch(e){console.warn('Support realtime:',e);}
+  // Listen immediately for new payment submissions and approval/rejection status changes.
+  sb.channel('admin-payment-alerts')
+   .on('postgres_changes',{event:'INSERT',schema:'public',table:'lounge_payment_submissions'},p=>{
+     const row=p?.new;if(!row?.id)return;
+     const statusNow=String(row.status||'').toLowerCase();
+     if(statusNow==='pending'){
+       const who=getLounge(row.lounge_id)?.name||'A lounge';
+       notifyAdminBilling('Incoming payment',who+' submitted '+money(row.amount_kes)+' for review.','nova-payment-'+row.id);
+     }
+     clearTimeout(supportReloadTimer);supportReloadTimer=setTimeout(()=>loadAll(true),350);
+   })
+   .on('postgres_changes',{event:'UPDATE',schema:'public',table:'lounge_payment_submissions'},p=>{
+     const row=p?.new,old=p?.old;if(!row?.id)return;
+     const statusNow=String(row.status||'').toLowerCase(),statusBefore=String(old?.status||'').toLowerCase();
+     if(statusNow!==statusBefore&&['approved','rejected','paid','success','completed'].includes(statusNow)){
+       const who=getLounge(row.lounge_id)?.name||'A lounge';
+       notifyAdminBilling(statusNow==='rejected'?'Payment rejected':'Payment approval update',who+' payment status changed to '+statusNow+'.','nova-payment-status-'+row.id+'-'+statusNow);
+     }
+     clearTimeout(supportReloadTimer);supportReloadTimer=setTimeout(()=>loadAll(true),350);
+   })
+   .subscribe();
+ }catch(e){console.warn('Support/payment realtime:',e);}
 }
 function renderSupportList(){
  const s=state.support,box=$('supList');if(!box)return;
@@ -426,17 +478,12 @@ function renderSupport(){
  const s=state.support;
  if(s.err==='setup'){$('content').innerHTML='<section class="card empty">Live chat is not set up yet. Run <b>support_chat.sql</b> in the Supabase SQL editor, then reload this page.</section>';return;}
  if(s.err){$('content').innerHTML='<section class="card empty">Could not load support chats: '+esc(s.err)+'</section>';return;}
- $('content').innerHTML=`<div class="sup-wrap"><aside class="card sup-side"><div class="sup-tabs"><button data-supf="open">Open</button><button data-supf="resolved">Resolved</button><button data-supf="all">All</button><button type="button" id="enableSupportNotifications" title="Allow desktop alerts for incoming client messages">🔔 Alerts</button></div><div id="supList"></div></aside><section class="card sup-main" id="supThread"></section></div>`;
+ $('content').innerHTML=`<div class="sup-wrap"><aside class="card sup-side"><div class="sup-tabs"><button data-supf="open">Open</button><button data-supf="resolved">Resolved</button><button data-supf="all">All</button><button type="button" id="enableSupportNotifications" title="Enable sound and desktop alerts for messages, payments and approvals">🔔 Alerts</button></div><div id="supList"></div></aside><section class="card sup-main" id="supThread"></section></div>`;
  document.querySelectorAll('[data-supf]').forEach(b=>b.addEventListener('click',()=>{s.filter=b.dataset.supf;renderSupportList();}));
  const alertBtn=$('enableSupportNotifications');
  if(alertBtn){
   alertBtn.addEventListener('click',async()=>{
-   const sound=enableNovaSound();
-   const ok=await enableMessageNotifications();
-   alertBtn.textContent=sound?'🔔 Sound on':'🔔 Enable sound';
-   if(ok)toast('Sound and desktop notifications enabled for incoming client messages.');
-   else if(sound)toast('Message sound enabled. Allow browser notifications in site settings for desktop alerts.');
-   else toast('Sound could not start. Check device volume and browser settings.');
+   await enableAllNovaAlerts(alertBtn);
   });
   if(novaSoundEnabled)alertBtn.textContent='🔔 Sound on';
  }
@@ -499,7 +546,7 @@ function render(){
 }
 function downloadCsv(filename,rows){if(!rows?.length){toast('No records to export.');return;}const keys=[...new Set(rows.flatMap(r=>Object.keys(r)))];const quote=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const csv=[keys.map(quote).join(','),...rows.map(r=>keys.map(k=>quote(r[k])).join(','))].join('\r\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();URL.revokeObjectURL(a.href);toast('CSV export generated.');}
 function exportPayments(){downloadCsv('nova-payment-submissions.csv',state.payments.map(p=>({...p,lounge_name:getLounge(p.lounge_id)?.name||''})));}
-$('nav').addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(!b)return;state.page=b.dataset.page;$('sidebar').classList.remove('open');render();});
+$('sidebar').addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(!b||!$('sidebar').contains(b))return;state.page=b.dataset.page;$('sidebar').classList.remove('open');render();});
 $('refreshBtn').addEventListener('click',async e=>{
  const btn=e.currentTarget;if(btn.disabled)return;const original='↻ Refresh';btn.disabled=true;btn.textContent='↻ Refreshing…';btn.setAttribute('aria-busy','true');
  try{await loadAll(false,true);}catch(err){state.loading=false;warn('Refresh failed: '+fmtError(err));}finally{btn.disabled=false;btn.textContent=original;btn.removeAttribute('aria-busy');}
