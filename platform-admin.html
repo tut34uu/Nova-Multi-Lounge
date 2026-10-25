@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#070d18">
 <title>Nova · Platform Admin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -18,45 +18,48 @@ aside{background:rgba(7,14,26,.94);backdrop-filter:blur(18px);border-right-color
 @media(max-width:600px){.detail-panel{padding:18px}.detail-grid{grid-template-columns:1fr 1fr}.pagehead h1{font-size:25px}}
 @media print{aside,.top,.actions,.btn,.toolbar{display:none!important}main{padding:0}.card{break-inside:avoid}}
 
-/* Accessible light/dark theme switch */
-.theme-toggle{white-space:nowrap;min-width:112px}
-body.dark-theme{--bg:#08111f;--panel:#0e1b2d;--panel2:#12233a;--line:#263750;--text:#edf5ff;--muted:#9aadc4;--blue:#6c9cff;--cyan:#58d8f4;--green:#55e0b0;--amber:#ffd078;--red:#ff7f91;color-scheme:dark;background:radial-gradient(ellipse at 72% -18%,rgba(40,112,191,.24),transparent 42%),radial-gradient(ellipse at -12% 45%,rgba(72,70,170,.10),transparent 38%),var(--bg);color:var(--text)}
-body.dark-theme aside{background:#081321;border-right-color:var(--line)}
-body.dark-theme .brand small,body.dark-theme .navlabel{color:#9ab2d0}
-body.dark-theme .nav button{color:#c7d9ce}body.dark-theme .nav button.active,body.dark-theme .nav button:hover{background:#102b49;border-color:#21486f;color:#fff}
-body.dark-theme .sidebottom{background:#0e1c2f;border-color:#263750;color:var(--muted)}body.dark-theme .sidebottom strong{color:var(--text)}
-body.dark-theme .card{background:linear-gradient(145deg,#111f34,#0a1424);border-color:#263750;box-shadow:0 14px 40px #0003}
-body.dark-theme .kpi .topline,body.dark-theme .kpi-action .topline{color:#d0def0}body.dark-theme .kpi-action .kpi-hint{color:#9bc6ff;border-top-color:#263750}body.dark-theme .ico{background:#17395d;border-color:#2c4d70;color:#8ec5ff}
-body.dark-theme .pagehead h1{color:#edf5ff}body.dark-theme .pagehead p{color:#9aadc4}
-body.dark-theme .search,body.dark-theme .toolbar input,body.dark-theme .toolbar select,body.dark-theme .field{background:#0a1627;border-color:#2a3b55;color:#edf5ff}body.dark-theme .search input{color:#edf5ff}
-body.dark-theme .btn{background:linear-gradient(180deg,#162942,#102036);border-color:#2c405b;color:#edf5ff}body.dark-theme .btn.primary{background:linear-gradient(135deg,#347ff0,#235fd0);border-color:#4c93ff;color:#fff}
-body.dark-theme .sectionhead{border-bottom-color:#263750}body.dark-theme .chart{background:repeating-linear-gradient(to bottom,transparent 0,transparent 43px,#21344a 44px,#21344a 45px);border-bottom-color:#263750}body.dark-theme .track{background:#21344a}
-body.dark-theme th{background:#0a1525;color:#8da7c5}body.dark-theme th,body.dark-theme td{border-bottom-color:#263750}body.dark-theme td{color:#d7e5f6}body.dark-theme tbody tr:hover{background:#14283e}
-body.dark-theme .pill{background:#1b3148;color:#b8cbe0;border-color:#2c405b}body.dark-theme .pill.active,body.dark-theme .pill.approved,body.dark-theme .pill.success{background:#103d33;color:#80f0c2}body.dark-theme .pill.pending{background:#493716;color:#ffd27b}body.dark-theme .pill.expired,body.dark-theme .pill.rejected,body.dark-theme .pill.failed{background:#49232c;color:#ffabb5}
-body.dark-theme .mini-card{background:#0b192a;border-color:#263750}body.dark-theme .notice{background:#2a2114;border-color:#5a4828;color:#f8d89a}body.dark-theme .login{background:#0e1b2d;border-color:#263750}body.dark-theme .login label{color:#b8c9de}body.dark-theme .login input{background:#081625;border-color:#263750;color:#fff}body.dark-theme .detail-panel{background:#0b1728;border-left-color:#2b405b}body.dark-theme .detail-stat{background:#0e2035;border-color:#263750}body.dark-theme .timeline{border-left-color:#2b4260}body.dark-theme .linkbtn{color:#9bc6ff}body.dark-theme .section-kicker{color:#87a7cd}
-/* Every metric card is an intentional, visibly interactive control. */
-.kpi-action{min-height:150px}.kpi-action .kpi-hint{margin-top:12px}.kpi-action:hover .topline span:first-child{text-decoration:underline;text-underline-offset:3px}
-.pagehead h1{display:inline-flex;align-items:center;gap:10px}.pagehead h1:after{content:'↗';font-size:14px;color:#4ba982;background:#e6f4ec;border:1px solid #d1e9dc;border-radius:8px;padding:3px 7px;opacity:.8}
-body.dark-theme .pagehead h1:after{color:#9bc6ff;background:#17395d;border-color:#2c4d70}
-.nav button{position:relative}.nav button:after{content:'↗';margin-left:auto;font-size:11px;opacity:0;transform:translateX(-3px);transition:.16s}.nav button:hover:after,.nav button.active:after{opacity:.75;transform:none}
-</style>
-<style id="nova-palette-refresh">
-/* Nova premium palette: warm ivory, deep evergreen, and vivid jade */
-:root{color-scheme:light;--bg:#f4f6f2;--panel:#ffffff;--panel2:#edf2ec;--line:#dce5dc;--text:#1c3028;--muted:#718078;--blue:#26745c;--cyan:#36a884;--green:#18865f;--amber:#b7791f;--red:#c44956;--purple:#7963b6}
-body{background:radial-gradient(ellipse at 75% -15%,rgba(54,168,132,.13),transparent 42%),radial-gradient(ellipse at -10% 35%,rgba(38,116,92,.07),transparent 38%),var(--bg);color:var(--text)}
-aside{background:#17382d;border-right:1px solid #254b3d;color:#edf7f0}
-.brand b span{color:#6ee0b2}.brand small{color:#b0c9bc}.tag{background:rgba(110,224,178,.12);border-color:rgba(110,224,178,.25);color:#a8f1d0}
-.navlabel{color:#9bb8a8}.nav button{color:#c7d9ce}.nav button.active,.nav button:hover{background:rgba(110,224,178,.13);border-color:rgba(110,224,178,.25);color:#fff}.nav button.active{box-shadow:inset 3px 0 #6ee0b2}.nav .count{background:#28664f;color:#eafff3}
-.sidebottom{background:rgba(255,255,255,.05);border-color:#355747;color:#b8cec0}.sidebottom strong{color:#f3fff7}
-.card{background:linear-gradient(145deg,#fff,#fbfdf9);border-color:var(--line);box-shadow:0 8px 25px rgba(29,62,45,.055);border-radius:16px}.kpi .topline{color:#5e7166}.kpi:after{background:rgba(54,168,132,.09)}
-.ico{background:#e6f4ec;border:1px solid #d1e9dc;color:#237a5c}.kpi-action:before{background:linear-gradient(135deg,rgba(54,168,132,.10),transparent 62%)}.kpi-action:hover{border-color:#54b38c;box-shadow:0 14px 30px rgba(29,87,60,.12),0 0 0 1px rgba(54,168,132,.12)}.kpi-action:focus-visible{outline-color:#16845e}.kpi-action .kpi-hint{color:#237a5c;border-top-color:#e0e9e0}.kpi-action .topline{color:#42584b}.kpi-action .ico{background:linear-gradient(145deg,#d9f0e4,#eff9f3);border-color:#c5e6d4}
-.pagehead h1{color:#203b2e}.pagehead p{color:#718078}.search,.toolbar input,.toolbar select,.field{background:#fff;border-color:#d7e2d8;color:#263d31}.search input{color:#263d31}.search:focus-within,.toolbar input:focus,.field:focus{border-color:#4ba982;box-shadow:0 0 0 3px rgba(54,168,132,.13)}
-.btn{background:linear-gradient(180deg,#fff,#f5f8f4);border-color:#d5e1d6;color:#294336}.btn.primary{background:linear-gradient(135deg,#26815f,#176749);border-color:#267a5a;color:#fff;box-shadow:0 6px 16px rgba(30,120,83,.17)}.btn.green{background:#e2f5e9;border-color:#b9e4c9;color:#176b49}.btn.red{background:#fff0f0;border-color:#f1c8cb;color:#a72e3d}
-.sectionhead{border-bottom-color:#e5ebe4}.chart{background:repeating-linear-gradient(to bottom,transparent 0,transparent 43px,#e7eee6 44px,#e7eee6 45px);border-bottom-color:#e1e9e0}.bar{background:linear-gradient(180deg,#45c49a,#237a5c)}.track{background:#e6eee6}.fill{background:#32a778}.fill.pending{background:#dca23e}.fill.expired{background:#d65d68}.fill.suspended{background:#9278cc}
-th{background:#f0f5ef;color:#718078}th,td{border-bottom-color:#e5ebe4}td{color:#34493d}tbody tr:hover{background:#f2f8f2}.pill{background:#eef3ed;color:#53665a;border-color:#e0e8df}.pill.active,.pill.approved,.pill.success{background:#e1f5e9;color:#176b49;border-color:#c5e8d2}.pill.pending{background:#fff4dc;color:#956315;border-color:#f4e3b9}.pill.expired,.pill.rejected,.pill.failed{background:#ffeded;color:#a72e3d;border-color:#f3d0d2}.pill.suspended{background:#f0ebfa;color:#69509d;border-color:#e0d7f2}
-.mini-card{background:#f8fbf7;border-color:#e0e9df}.notice{background:#fff7e6;border-color:#f0dba9;color:#825b16}.login{box-shadow:0 25px 80px rgba(29,62,45,.13);border-color:#dce7dc;background:#fff}.login label{color:#52685a}.login input{background:#fbfdf9;border-color:#d8e3d8;color:#243b2e}.login p{color:#718078}.error{color:#b52f42}.toast{background:#e2f5e9;border-color:#b4e1c6;color:#176b49;box-shadow:0 12px 30px rgba(29,62,45,.16)}
-.detail-overlay{background:rgba(20,44,32,.35)}.detail-panel{background:#fbfdf9;border-left-color:#d7e3d7;box-shadow:-25px 0 80px rgba(26,55,37,.18)}.detail-stat{background:#f2f7f1;border-color:#dce7dc}.timeline{border-left-color:#c8ddce}.timeline-item:before{background:#35a67d;box-shadow:0 0 0 4px #e0f2e6}.linkbtn{color:#237a5c}.section-kicker{color:#478066}
-@media(prefers-reduced-motion:no-preference){.card{transition:box-shadow .18s ease,border-color .18s ease}}
+/* Payment review improvements */
+.pill.upgrade{background:#18334f;color:#9fd0ff}.pill.newsub{background:#2a2250;color:#cdbcff}.pill.check{background:#493716;color:#ffd27b}
+.rv-warn{padding:10px 12px;border-radius:9px;border:1px solid #5a4828;background:#2a2114;color:#f8d89a;margin:8px 0;font-size:12px}
+.rv-err{padding:10px 12px;border-radius:9px;border:1px solid #6a2f3a;background:#2b1219;color:#ffb3bf;margin:10px 0;font-size:12px}
+.rv-check{display:flex;gap:10px;align-items:flex-start;margin:16px 0 10px;padding:12px;border:1px solid var(--line);border-radius:10px;background:#0e2035;cursor:pointer}
+.rv-check input{margin-top:3px}
+.rv-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.rv-note{width:100%;min-height:70px;resize:vertical;margin-top:6px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+tr[data-pstatus="pending"] td:first-child{box-shadow:inset 3px 0 0 var(--amber)}
+
+/* Support inbox */
+.sup-wrap{display:grid;grid-template-columns:340px 1fr;gap:14px;align-items:start}
+.sup-side{padding:0;overflow:hidden}
+.sup-tabs{display:flex;gap:6px;padding:10px;border-bottom:1px solid var(--line)}
+.sup-tabs button{flex:1;padding:8px 6px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;font:inherit;font-size:12px}
+.sup-tabs button.on{background:var(--panel2);color:var(--text);border-color:var(--blue)}
+#supList{max-height:calc(100vh - 300px);overflow-y:auto}
+.sup-item{padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer;display:grid;gap:3px}
+.sup-item:hover,.sup-item.sel{background:var(--panel2)}
+.sup-item .top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.sup-item b{font-size:13.5px}.sup-item .who{color:var(--muted);font-size:12px}
+.sup-item .pv{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sup-item.unread .pv{color:var(--text);font-weight:600}
+.sup-dot{background:var(--red);color:#fff;border-radius:10px;font-size:11px;padding:1px 7px;font-weight:700}
+.sup-main{padding:0;display:flex;flex-direction:column;overflow:hidden;min-height:480px}
+.sup-head{padding:14px 16px;border-bottom:1px solid var(--line)}
+.sup-head h3{margin:0 0 4px;font-size:16px}
+.sup-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-top:10px;font-size:12px}
+.sup-info span{color:var(--muted);display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em}
+.sup-info a{color:var(--cyan)}
+.sup-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.sup-msgs{overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;height:calc(100vh - 470px);min-height:240px}
+.sup-b{max-width:75%;padding:9px 12px;border-radius:14px;font-size:13.5px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
+.sup-b time{display:block;font-size:10px;opacity:.6;margin-top:4px}
+.sup-b.in{align-self:flex-start;background:var(--panel2);border:1px solid var(--line);border-bottom-left-radius:4px}
+.sup-b.out{align-self:flex-end;background:#1c5fb8;color:#fff;border-bottom-right-radius:4px}
+.sup-day{align-self:center;color:var(--muted);font-size:11px;margin:4px 0}
+.sup-form{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
+.sup-form textarea{flex:1;min-height:44px;max-height:120px;resize:vertical}
+.sup-empty{padding:40px 20px;text-align:center;color:var(--muted)}
+@media(max-width:900px){.sup-wrap{grid-template-columns:1fr}#supList{max-height:260px}.sup-msgs{height:360px}}
 </style>
 </head>
 <body>
@@ -74,17 +77,18 @@ th{background:#f0f5ef;color:#718078}th,td{border-bottom-color:#e5ebe4}td{color:#
  <div><div class="navlabel">Workspace</div><nav class="nav" id="nav">
   <button class="active" data-page="overview">◈ <span>Overview</span></button>
   <button data-page="payments">▣ <span>Payments & approvals</span><span class="count" id="pendingBadge">—</span></button>
+  <button data-page="support">✉ <span>Support inbox</span><span class="count" id="supportBadge" hidden>0</span></button>
   <button data-page="lounges">▦ <span>Lounges & customers</span></button>
   <button data-page="subscriptions">◷ <span>Subscriptions</span></button>
   <button data-page="analytics">⌁ <span>Business analytics</span></button>
   <button data-page="reports">▤ <span>Reports</span></button>
   <button data-page="audit">◇ <span>Audit & activity</span></button>
  </nav></div>
- <div><div class="navlabel">Administration</div><nav class="nav" id="adminNav"><button data-page="settings" type="button">⚙ <span>Platform settings</span></button><button id="signOutBtn" type="button">⇥ <span>Sign out</span></button></nav></div>
+ <div><div class="navlabel">Administration</div><nav class="nav"><button data-page="settings">⚙ <span>Platform settings</span></button><button id="signOutBtn">⇥ <span>Sign out</span></button></nav></div>
  <div class="sidebottom"><strong>Nova Platform Admin</strong><span id="adminEmail">—</span><br><span class="muted">Connected to Nova production project</span></div>
 </aside>
 <main>
- <header class="top"><button class="btn mobilemenu" id="menuBtn">☰</button><div class="search">⌕ <input id="globalSearch" placeholder="Search lounges, IDs, payment references…" aria-label="Search"></div><div class="righttop"><span id="lastUpdated">Not refreshed yet</span><div class="avatar">NA</div><span id="topEmail">Admin</span><button class="btn theme-toggle" id="themeToggle" type="button" aria-pressed="false">☾ Dark mode</button><button class="btn" id="refreshBtn">↻ Refresh</button></div></header>
+ <header class="top"><button class="btn mobilemenu" id="menuBtn">☰</button><div class="search">⌕ <input id="globalSearch" placeholder="Search lounges, IDs, payment references…" aria-label="Search"></div><div class="righttop"><span id="lastUpdated">Not refreshed yet</span><div class="avatar">NA</div><span id="topEmail">Admin</span><button class="btn" id="refreshBtn">↻ Refresh</button></div></header>
  <section class="pagehead"><div><h1 id="pageTitle">Platform overview</h1><p id="pageSubtitle">Your business at a glance. Metrics are loaded from the live Nova database.</p></div><div class="actions"><select class="field" id="dateRange" aria-label="Date range"><option value="30">Last 30 days</option><option value="7">Last 7 days</option><option value="90">Last 90 days</option><option value="365">Last 12 months</option><option value="all">All time</option></select><button class="btn" id="exportBtn">↓ Export CSV</button></div></section>
  <div id="warning" class="notice hidden"></div>
  <div id="content"></div>
@@ -99,8 +103,8 @@ const SUPABASE_URL='https://sixtpaitbpnuiquyyxsp.supabase.co';
 const SUPABASE_KEY='sb_publishable_gaSQMZvErbkv1L8051amZg_cptbzH4K';
 const sb=window.supabase?.createClient ? window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY) : null;
 const $=id=>document.getElementById(id);
-const state={user:null,page:'overview',lounges:[],subs:[],payments:[],mpesa:[],errors:[],search:'',range:'30',loading:false};
-const titles={overview:['Platform overview','Your business at a glance. Metrics are loaded from the live Nova database.'],payments:['Payments & approvals','Review manual payment submissions and monitor M-Pesa request statuses.'],lounges:['Lounges & customers','Every registered lounge and its current platform status.'],subscriptions:['Subscriptions','Entitlements, expiry dates and console counts.'],analytics:['Business analytics','Revenue, customer growth and subscription health.'],reports:['Reports','Export filtered platform data for your business records.'],audit:['Audit & activity','Recent payment and subscription activity visible to this admin account.'],settings:['Platform settings','Secure platform administration and integration health.']};
+const state={support:{convos:[],sel:null,msgs:[],filter:'open',draft:'',err:'',loaded:false,started:false,unread:0,seen:{},sending:false,at:0},payFilter:'all',prevPending:null,user:null,page:'overview',lounges:[],subs:[],payments:[],mpesa:[],errors:[],search:'',range:'30',loading:false};
+const titles={overview:['Platform overview','Your business at a glance. Metrics are loaded from the live Nova database.'],support:['Support inbox','Live chats from lounge owners and staff. Reply here and they see it instantly.'],payments:['Payments & approvals','Review manual payment submissions and monitor M-Pesa request statuses.'],lounges:['Lounges & customers','Every registered lounge and its current platform status.'],subscriptions:['Subscriptions','Entitlements, expiry dates and console counts.'],analytics:['Business analytics','Revenue, customer growth and subscription health.'],reports:['Reports','Export filtered platform data for your business records.'],audit:['Audit & activity','Recent payment and subscription activity visible to this admin account.'],settings:['Platform settings','Secure platform administration and integration health.']};
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function money(v){return 'KSh '+Number(v||0).toLocaleString('en-KE',{maximumFractionDigits:2});}
 function date(v){if(!v)return '—';const d=new Date(v);return Number.isNaN(+d)?esc(v):d.toLocaleString('en-KE',{dateStyle:'medium',timeStyle:'short'});}
@@ -128,30 +132,48 @@ $('signOutBtn').addEventListener('click',async()=>{await sb.auth.signOut();state
 if(sb)sb.auth.onAuthStateChange((_event,session)=>{if(!session){state.user=null;showLogin();}});
 if(!sb){showLogin('Sign-in could not initialize because the Supabase library did not load. Check internet access and refresh this page.');}
 async function safeQuery(label,query){try{const {data,error}=await query;if(error)throw error;return data||[];}catch(e){state.errors.push(label+': '+fmtError(e));return [];}}
-async function loadAll(){
- if(state.loading)return;state.loading=true;warn('');state.errors=[];$('content').innerHTML='<section class="card empty">Loading live Nova platform records…</section>';
+async function loadAll(quiet){
+ if(state.loading)return;state.loading=true;state.errors=[];if(!quiet){warn('');$('content').innerHTML='<section class="card empty">Loading live Nova platform records…</section>';}
  const since=state.range==='all'?null:new Date(Date.now()-Number(state.range)*86400000).toISOString();
  const lq=sb.from('lounges').select('id,name,status,console_count,created_at').order('created_at',{ascending:false}).limit(2000);
  const sq=sb.from('lounge_subscriptions').select('id,lounge_id,console_count,status,monthly_amount_kes,starts_at,ends_at,created_at').order('created_at',{ascending:false}).limit(5000);
- let pq=sb.from('lounge_payment_submissions').select('id,lounge_id,amount_kes,payment_method,reference_code,payer_phone,payment_month,created_at,status').order('created_at',{ascending:false}).limit(2000);
+ let pq=sb.from('lounge_payment_submissions').select('id,lounge_id,amount_kes,console_count,payment_method,reference_code,payer_phone,payment_month,created_at,status,admin_note,reviewed_at').order('created_at',{ascending:false}).limit(2000);
+ const pendq=sb.from('lounge_payment_submissions').select('id,lounge_id,amount_kes,console_count,payment_method,reference_code,payer_phone,payment_month,created_at,status,admin_note,reviewed_at').eq('status','pending').order('created_at',{ascending:false}).limit(500);
  if(since)pq=pq.gte('created_at',since);
  const mq=sb.from('lounge_mpesa_requests').select('*').order('created_at',{ascending:false}).limit(500);
- const results=await Promise.all([safeQuery('Lounges',lq),safeQuery('Subscriptions',sq),safeQuery('Payment submissions',pq),safeQuery('M-Pesa requests',mq)]);
+ const results=await Promise.all([safeQuery('Lounges',lq),safeQuery('Subscriptions',sq),safeQuery('Payment submissions',pq),safeQuery('M-Pesa requests',mq),safeQuery('Pending payments',pendq)]);
  [state.lounges,state.subs,state.payments,state.mpesa]=results;
+ { const seen=new Set(state.payments.map(p=>p.id));for(const p of results[4])if(!seen.has(p.id))state.payments.push(p);state.payments.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)); }
  state.loading=false;$('lastUpdated').textContent='Updated '+new Date().toLocaleTimeString('en-KE',{hour:'2-digit',minute:'2-digit'});
- $('pendingBadge').textContent=state.payments.filter(p=>String(p.status).toLowerCase()==='pending').length;
+ {const pc=state.payments.filter(p=>String(p.status).toLowerCase()==='pending').length;$('pendingBadge').textContent=pc;state.pendingCount=pc;refreshTitle();if(state.prevPending!==null&&pc>state.prevPending)toast('New payment waiting for review.');state.prevPending=pc;}
  if(state.errors.length)warn('Some live data could not be loaded. This is usually caused by a missing table, column, or Row Level Security permission. '+state.errors.join(' · '));
- render();
+ { const a=document.activeElement,typing=a&&['INPUT','SELECT','TEXTAREA'].includes(a.tagName);if(!(quiet&&typing))render(); }
+ startSupport();
 }
 function latestSubs(){const m=new Map();for(const s of [...state.subs].sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))){if(!m.has(s.lounge_id))m.set(s.lounge_id,s);}return m;}
 function isActiveSub(s,l){return !!(s&&String(s.status).toLowerCase()==='active'&&(!s.ends_at||new Date(s.ends_at).getTime()>Date.now())&&String(l?.status||'').toLowerCase()==='active');}
 function getLounge(id){return state.lounges.find(l=>l.id===id);}
 function latestFor(id){return latestSubs().get(id)||null;}
 function filteredLounges(){const q=state.search.toLowerCase();return state.lounges.filter(l=>!q||[l.name,l.id,l.status].some(v=>String(v||'').toLowerCase().includes(q)));}
-function filteredPayments(){const q=state.search.toLowerCase();return state.payments.filter(p=>!q||[p.reference_code,p.payer_phone,p.status,getLounge(p.lounge_id)?.name,p.payment_method].some(v=>String(v||'').toLowerCase().includes(q)));}
-function card(label,value,sub,icon='◈',tone=''){const targets={'Registered lounges':['lounges','Browse lounges'],'Active lounge records':['lounges','View active lounges'],'Inactive':['lounges','Review inactive lounges'],'Suspended':['lounges','Review suspended lounges'],'Search results':['lounges','View matching lounges'],'Active subscriptions':['subscriptions','View subscriptions'],'Active & unexpired':['subscriptions','View valid subscriptions'],'Active subscribers':['subscriptions','View subscribers'],'Expiring in 7 days':['subscriptions','Review renewals'],'Expired':['subscriptions','Review expired subscriptions'],'Subscription records':['subscriptions','View subscription ledger'],'Console entitlements':['subscriptions','View console entitlements'],'Paid consoles':['subscriptions','View console entitlements'],'Verified revenue':['analytics','Open revenue analytics'],'Verified collected revenue':['analytics','Open revenue analytics'],'Estimated recurring monthly value':['analytics','View recurring value'],'Average monthly value / active lounge':['analytics','View average value'],'Payment approval rate':['payments','View payment decisions'],'Active console entitlements':['subscriptions','View console entitlements'],'Lounge export':['lounges','Open lounge records'],'Subscription export':['subscriptions','Open subscription records'],'Payment export':['payments','Open payment records'],'STK request export':['payments','View STK requests'],'Data warnings':['audit','Review data warnings']};const target=targets[label]||[state.page,'Open '+label.toLowerCase()];const inner=`<div class="topline"><span>${label}</span><span class="ico">${icon}</span></div><strong>${value}</strong><small class="${tone}">${sub}</small>`;return `<button type="button" class="card kpi kpi-action" data-kpi-target="${target[0]}" data-kpi-label="${esc(label)}" aria-label="${esc(target[1]+': '+label)}">${inner}<span class="kpi-hint"><span>${target[1]}</span><span aria-hidden="true">↗</span></span></button>`;}
+function filteredPayments(){const q=state.search.toLowerCase();const rank=p=>String(p.status).toLowerCase()==='pending'?0:1;return state.payments.filter(p=>!q||[p.reference_code,p.payer_phone,p.status,getLounge(p.lounge_id)?.name,p.payment_method].some(v=>String(v||'').toLowerCase().includes(q))).sort((a,b)=>rank(a)-rank(b)||new Date(b.created_at||0)-new Date(a.created_at||0));}
+function card(label,value,sub,icon='◈',tone=''){const targets={'Registered lounges':['lounges','Browse lounges'],'Active subscriptions':['subscriptions','View subscriptions'],'Active subscribers':['subscriptions','View subscribers'],'Paid consoles':['subscriptions','View console entitlements'],'Verified revenue':['analytics','Open revenue analytics']};const target=targets[label];const inner=`<div class="topline"><span>${label}</span><span class="ico">${icon}</span></div><strong>${value}</strong><small class="${tone}">${sub}</small>`;return target?`<button type="button" class="card kpi kpi-action" data-kpi-target="${target[0]}" aria-label="${target[1]}: ${label}">${inner}<span class="kpi-hint"><span>${target[1]}</span><span aria-hidden="true">↗</span></span></button>`:`<article class="card kpi">${inner}</article>`;}
 function table(headers,rows,empty='No records found.'){return `<div class="tablewrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows||`<tr><td colspan="${headers.length}" class="empty">${empty}</td></tr>`}</tbody></table></div>`;}
-function paymentRows(rows){return rows.map(p=>{const l=getLounge(p.lounge_id);return `<tr><td>${date(p.created_at)}</td><td><strong>${esc(l?.name||'Unknown lounge')}</strong><div class="muted small">${esc(p.lounge_id||'')}</div></td><td>${money(p.amount_kes)}</td><td>${esc(p.payment_method||'—')}</td><td>${esc(p.reference_code||'—')}</td><td>${status(p.status)}</td><td><button class="btn" data-view-payment="${esc(p.id)}">Review</button></td></tr>`}).join('');}
+const PRICE_PER_BAY=250;
+function paymentInfo(p){
+ const l=getLounge(p.lounge_id),s=latestFor(p.lounge_id),cnt=Number(p.console_count||0),amt=Number(p.amount_kes||0),pending=String(p.status).toLowerCase()==='pending';
+ const current=s?Number(s.console_count||0):0,active=isActiveSub(s,l);
+ const info={kind:'record',label:'',detail:cnt?cnt+' bay'+(cnt===1?'':'s'):'—',expected:null,mismatch:false,lapsed:false,cnt,amt,current};
+ if(!pending)return info;
+ if(active&&cnt>current){info.kind='upgrade';info.label='Upgrade';info.detail=current+' → '+cnt+' bays (+'+(cnt-current)+')';info.expected=(cnt-current)*PRICE_PER_BAY;}
+ else if(active){info.kind='invalid';info.label='Check';info.detail='Already active; does not raise bays';}
+ else if(String(l?.status||'').toLowerCase()==='pending'){info.kind='new';info.label='New subscription';info.expected=cnt*PRICE_PER_BAY;}
+ else{info.kind='renewal';info.label='Renewal';info.lapsed=true;info.expected=cnt*PRICE_PER_BAY;}
+ info.mismatch=info.expected!=null&&(!cnt||amt!==info.expected);
+ return info;
+}
+function paymentRows(rows){return rows.map(p=>{const l=getLounge(p.lounge_id),i=paymentInfo(p),pend=String(p.status).toLowerCase()==='pending';
+ const typeCell=(i.label?`<span class="pill ${i.kind==='upgrade'?'upgrade':i.kind==='new'?'newsub':'check'}">${esc(i.label)}</span>`:'')+`<div class="muted small">${esc(i.detail)}</div>`;
+ return `<tr data-pstatus="${esc(String(p.status||'').toLowerCase())}"><td>${date(p.created_at)}</td><td><strong>${esc(l?.name||'Unknown lounge')}</strong><div class="muted small">${esc(p.lounge_id||'')}</div></td><td>${typeCell}</td><td>${money(p.amount_kes)}${i.mismatch?`<div class="small" style="color:var(--amber)" title="Expected ${esc(money(i.expected))}">⚠ expected ${esc(money(i.expected))}</div>`:''}</td><td>${esc(p.payment_method||'—')}</td><td>${esc(p.reference_code||'—')}</td><td>${status(p.status)}</td><td><button class="btn${pend?' primary':''}" data-view-payment="${esc(p.id)}">${pend?'Review':'View'}</button></td></tr>`}).join('');}
 function loungeRows(rows){return rows.map(l=>{const s=latestFor(l.id);return `<tr><td><strong>${esc(l.name||'Unnamed lounge')}</strong><div class="muted small">${esc(l.id)}</div></td><td>${status(l.status)}</td><td>${s?status(s.status):'<span class="pill">No subscription</span>'}</td><td>${Number(s?.console_count??l.console_count??0)}</td><td>${money(s?.monthly_amount_kes||0)}</td><td>${day(s?.ends_at)}</td><td>${day(l.created_at)}</td><td><button class="btn" data-view-lounge="${esc(l.id)}">Open profile ↗</button></td></tr>`}).join('');}
 function subRows(rows){return rows.map(s=>`<tr><td>${esc(getLounge(s.lounge_id)?.name||'Unknown lounge')}</td><td>${Number(s.console_count||0)}</td><td>${money(s.monthly_amount_kes)}</td><td>${status(s.status)}</td><td>${day(s.starts_at||s.created_at)}</td><td>${day(s.ends_at)}</td><td>${date(s.created_at)}</td></tr>`).join('');}
 function barChart(values,labels){const max=Math.max(1,...values);return `<div class="chart">${values.map((v,i)=>`<div class="barcol"><div class="bar" style="height:${Math.max(2,Math.round(v/max*100))}%" title="${esc(money(v))}"></div><span>${esc(labels[i])}</span></div>`).join('')}</div>`;}
@@ -171,10 +193,166 @@ function renderOverview(){
 }
 function renderPayments(){
  const rows=filteredPayments(),pending=rows.filter(p=>String(p.status).toLowerCase()==='pending');
- $('content').innerHTML=`<div class="grid kpis">${card('Pending review',pending.length,'Awaiting admin decision','◷','warn')}${card('Approved',rows.filter(p=>String(p.status).toLowerCase()==='approved').length,'In current loaded period','✓','up')}${card('Rejected',rows.filter(p=>String(p.status).toLowerCase()==='rejected').length,'In current loaded period','×','danger')}${card('Payment submissions',rows.length,'Filtered records','▤')}${card('M-Pesa requests',state.mpesa.length,'STK push monitoring records','⌁')}</div><section class="card"><div class="sectionhead"><div><h2>Payment review queue</h2><p>Confirm payment in the provider record before approving.</p></div><button class="btn" id="refreshPayments">↻ Refresh queue</button></div><div class="toolbar"><input id="paymentSearch" placeholder="Search lounge, phone, reference…" value="${esc(state.search)}"><select id="paymentFilter"><option value="all">All statuses</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select></div>${table(['Submitted','Lounge / ID','Amount','Method','Reference','Status','Action'],paymentRows(rows),'No payment submissions match your search.')}</section><section class="card" style="margin-top:15px"><div class="sectionhead"><div><h2>M-Pesa STK requests</h2><p>Read-only monitoring of the latest 500 requests available to this account.</p></div></div>${table(['Created','Lounge','Amount','Phone','Status','Checkout ID'],state.mpesa.map(m=>`<tr><td>${date(m.created_at)}</td><td>${esc(getLounge(m.lounge_id)?.name||m.lounge_id||'—')}</td><td>${money(m.amount_kes??m.amount)}</td><td>${esc(m.phone_number||m.phone||'—')}</td><td>${status(m.status)}</td><td title="${esc(m.checkout_request_id||'')}">${esc((m.checkout_request_id||'—').slice(0,26))}</td></tr>`).join(''),'No STK requests found.')}</section>`;
+ $('content').innerHTML=`<div class="grid kpis">${card('Pending review',pending.length,'Awaiting admin decision','◷','warn')}${card('Approved',rows.filter(p=>String(p.status).toLowerCase()==='approved').length,'In current loaded period','✓','up')}${card('Rejected',rows.filter(p=>String(p.status).toLowerCase()==='rejected').length,'In current loaded period','×','danger')}${card('Payment submissions',rows.length,'Filtered records','▤')}${card('M-Pesa requests',state.mpesa.length,'STK push monitoring records','⌁')}</div><section class="card"><div class="sectionhead"><div><h2>Payment review queue</h2><p>Confirm payment in the provider record before approving.</p></div><button class="btn" id="refreshPayments">↻ Refresh queue</button></div><div class="toolbar"><input id="paymentSearch" placeholder="Search lounge, phone, reference…" value="${esc(state.search)}"><select id="paymentFilter"><option value="all">All statuses</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select></div>${table(['Submitted','Lounge / ID','Type / bays','Amount','Method','Reference','Status','Action'],paymentRows(rows),'No payment submissions match your search.')}</section><section class="card" style="margin-top:15px"><div class="sectionhead"><div><h2>M-Pesa STK requests</h2><p>Read-only monitoring of the latest 500 requests available to this account.</p></div></div>${table(['Created','Lounge','Amount','Phone','Status','Checkout ID'],state.mpesa.map(m=>`<tr><td>${date(m.created_at)}</td><td>${esc(getLounge(m.lounge_id)?.name||m.lounge_id||'—')}</td><td>${money(m.amount_kes??m.amount)}</td><td>${esc(m.phone_number||m.phone||'—')}</td><td>${status(m.status)}</td><td title="${esc(m.checkout_request_id||'')}">${esc((m.checkout_request_id||'—').slice(0,26))}</td></tr>`).join(''),'No STK requests found.')}</section>`;
  $('paymentSearch').addEventListener('input',e=>{state.search=e.target.value;renderPayments();const el=$('paymentSearch');el.focus();el.setSelectionRange(el.value.length,el.value.length);});
- $('paymentFilter').addEventListener('change',e=>{const v=e.target.value;document.querySelectorAll('#content tbody tr').forEach(tr=>{const pill=tr.querySelector('.pill');tr.style.display=(v==='all'||pill?.textContent.toLowerCase()===v)?'':'none';});});
+ $('paymentFilter').value=state.payFilter;applyPayFilter();$('paymentFilter').addEventListener('change',e=>{state.payFilter=e.target.value;applyPayFilter();});
  $('refreshPayments').addEventListener('click',loadAll);
+}
+
+function applyPayFilter(){const v=state.payFilter;document.querySelectorAll('#content tbody tr[data-pstatus]').forEach(tr=>{tr.style.display=(v==='all'||tr.dataset.pstatus===v)?'':'none';});}
+async function callReview(paymentId,decision,note){
+ const {data,error}=await sb.functions.invoke('review-payment',{body:{payment_id:paymentId,decision,admin_note:note||null}});
+ if(error){let msg=fmtError(error);try{const raw=await error.context.text();try{const j=JSON.parse(raw);msg=j.error||j.message||raw}catch{msg=raw||msg}}catch{}throw new Error(msg);}
+ if(data?.error)throw new Error(data.error);
+ return data||{};
+}
+function openPaymentReview(id){
+ const p=state.payments.find(x=>x.id===id);if(!p)return;
+ const l=getLounge(p.lounge_id),i=paymentInfo(p),pending=String(p.status).toLowerCase()==='pending';
+ const ref=String(p.reference_code||'').trim().toLowerCase();
+ const dupes=ref?state.payments.filter(x=>x.id!==p.id&&String(x.reference_code||'').trim().toLowerCase()===ref):[];
+ const warns=[];
+ if(pending){
+  if(!i.cnt)warns.push('No bay count was saved with this payment. The backend will reject approval.');
+  if(i.mismatch&&i.cnt)warns.push('Amount '+money(p.amount_kes)+' does not match the expected '+money(i.expected)+' for this payment. The backend will reject approval.');
+  if(i.kind==='invalid')warns.push('This lounge is already active and the payment does not raise its bay count. Reject it, or ask the owner to resubmit.');
+  if(i.lapsed)warns.push('This lounge is not pending and its subscription is not active. The review function currently activates pending lounges and upgrades active ones only, so approval will fail until renewals are supported.');
+ }
+ if(dupes.length)warns.push('The same reference appears in '+dupes.length+' other submission'+(dupes.length===1?'':'s')+'. Make sure it was not used twice.');
+ const blockApprove=!pending||i.kind==='invalid'||!i.cnt||i.mismatch||i.lapsed;
+ $('detailPanel').innerHTML=`<div class="detail-head"><div><div class="section-kicker" style="margin-top:0">Payment review</div><h2>${esc(l?.name||'Unknown lounge')}</h2><div class="muted small" style="overflow-wrap:anywhere">${esc(p.id)}</div><div style="margin-top:8px">${status(p.status)} ${i.label?`<span class="pill ${i.kind==='upgrade'?'upgrade':i.kind==='new'?'newsub':'check'}">${esc(i.label)}</span>`:''}</div></div><button class="btn" data-close-detail>Close</button></div>
+ <div class="detail-grid"><div class="detail-stat"><span>Amount paid</span><strong>${money(p.amount_kes)}</strong></div><div class="detail-stat"><span>Expected amount</span><strong>${i.expected!=null?money(i.expected):'—'}</strong></div><div class="detail-stat"><span>Bays</span><strong>${esc(i.detail)}</strong></div><div class="detail-stat"><span>Method</span><strong>${esc(p.payment_method||'—')}</strong></div><div class="detail-stat"><span>M-Pesa reference</span><strong>${esc(p.reference_code||'—')}</strong></div><div class="detail-stat"><span>Payer phone</span><strong>${esc(p.payer_phone||'—')}</strong></div><div class="detail-stat"><span>Submitted</span><strong>${date(p.created_at)}</strong></div><div class="detail-stat"><span>Reviewed</span><strong>${p.reviewed_at?date(p.reviewed_at):'—'}</strong></div></div>
+ ${warns.map(w=>`<div class="rv-warn">⚠ ${esc(w)}</div>`).join('')}
+ ${pending?`<label class="rv-check"><input type="checkbox" id="rvVerified"><span>I checked this reference and amount in the M-Pesa statement, and they match this lounge’s payment.</span></label>
+ <label class="muted small" for="rvNote">Admin note (required when rejecting)</label><textarea id="rvNote" class="field rv-note" maxlength="1000" placeholder="e.g. Reference not found in the statement"></textarea>
+ <div id="rvError" class="rv-err hidden"></div>
+ <div class="rv-actions"><button class="btn green" id="rvApprove" disabled>Approve &amp; activate</button><button class="btn danger" id="rvReject">Reject payment</button><button class="btn" data-close-detail>Cancel</button></div>`:`${p.admin_note?`<div class="section-kicker">Admin note</div><p>${esc(p.admin_note)}</p>`:''}<p class="footnote">This payment has already been reviewed.</p>`}`;
+ $('detailOverlay').classList.remove('hidden');
+ if(!pending)return;
+ const ok=$('rvVerified'),appr=$('rvApprove'),rej=$('rvReject'),err=$('rvError');
+ const sync=()=>{appr.disabled=blockApprove||!ok.checked;};ok.addEventListener('change',sync);sync();
+ async function run(decision){
+  const note=$('rvNote').value.trim();err.classList.add('hidden');
+  if(decision==='reject'&&note.length<3){err.textContent='Add a short reason so the owner knows why the payment was rejected.';err.classList.remove('hidden');return;}
+  appr.disabled=true;rej.disabled=true;(decision==='approve'?appr:rej).textContent='Working…';
+  try{const r=await callReview(p.id,decision,note);toast(r.message||(decision==='approve'?'Payment approved.':'Payment rejected.'));closeLoungeProfile();await loadAll(true);}
+  catch(e){err.textContent='Review failed: '+fmtError(e);err.classList.remove('hidden');appr.textContent='Approve & activate';rej.textContent='Reject payment';rej.disabled=false;sync();}
+ }
+ appr.addEventListener('click',()=>run('approve'));rej.addEventListener('click',()=>run('reject'));
+}
+/* Admin safety: sign out after 30 minutes without activity, and keep the queue fresh. */
+let lastActivity=Date.now();const IDLE_MS=30*60*1000;
+['click','keydown','pointerdown','touchstart','scroll'].forEach(ev=>document.addEventListener(ev,()=>{lastActivity=Date.now();},{passive:true}));
+setInterval(async()=>{if(!state.user||!sb)return;if(Date.now()-lastActivity>IDLE_MS){try{await sb.auth.signOut();}catch{}state.user=null;closeLoungeProfile();showLogin('You were signed out after 30 minutes of inactivity.');return;}if(!document.hidden){if(!state.loading)loadAll(true);supportTick();}},60000);
+
+/* ---------- Support inbox (live chat with lounges) ---------- */
+function hhmm(iso){try{return new Date(iso).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}catch{return ''}}
+function dayLabel(iso){try{const d=new Date(iso),n=new Date();if(d.toDateString()===n.toDateString())return 'Today';const y=new Date(n);y.setDate(n.getDate()-1);if(d.toDateString()===y.toDateString())return 'Yesterday';return d.toLocaleDateString([], {day:'numeric',month:'short',year:'numeric'})}catch{return ''}}
+function agoLabel(iso){try{const m=Math.round((Date.now()-new Date(iso).getTime())/60000);if(m<1)return 'now';if(m<60)return m+'m';if(m<1440)return Math.floor(m/60)+'h';return Math.floor(m/1440)+'d'}catch{return ''}}
+function refreshTitle(){const n=(state.pendingCount||0)+(state.support.unread||0);document.title=(n?'('+n+') ':'')+'Nova · Platform Admin';}
+function updateSupportBadge(){const s=state.support,b=$('supportBadge');if(b){b.textContent=s.unread>99?'99+':String(s.unread);b.hidden=!s.unread;}refreshTitle();}
+function supportSorted(){const s=state.support;let rows=s.convos.slice();if(s.filter==='open')rows=rows.filter(c=>c.status!=='resolved');else if(s.filter==='resolved')rows=rows.filter(c=>c.status==='resolved');return rows.sort((a,b)=>((b.unread_admin>0)-(a.unread_admin>0))||new Date(b.last_message_at)-new Date(a.last_message_at));}
+async function loadSupportList(quiet){
+ const s=state.support;if(!sb||!state.user)return;
+ const r=await sb.from('support_conversations').select('*').order('last_message_at',{ascending:false}).limit(300);
+ s.at=Date.now();
+ if(r.error){s.err=/support_conversations|schema cache|does not exist/i.test(r.error.message||'')?'setup':fmtError(r.error);s.loaded=true;if(state.page==='support')renderSupport();return;}
+ const prev=s.unread;s.err='';s.convos=r.data||[];s.unread=s.convos.reduce((n,c)=>n+(c.unread_admin||0),0);s.loaded=true;
+ updateSupportBadge();
+ if(quiet&&s.unread>prev&&!(state.page==='support'&&s.sel&&s.convos.find(c=>c.id===s.sel&&c.unread_admin&&document.hasFocus())))toast('New support message.');
+ if(state.page==='support'){renderSupportList();if(s.sel){const c=s.convos.find(x=>x.id===s.sel);if(c&&c.unread_admin&&document.hasFocus()){c.unread_admin=0;s.unread=s.convos.reduce((n,x)=>n+(x.unread_admin||0),0);updateSupportBadge();sb.rpc('nova_support_admin_read',{p_conversation_id:s.sel});renderSupportList();}renderSupportThread(true);}}
+}
+async function refreshSupportThread(){
+ const s=state.support;if(!s.sel||!sb)return;const id=s.sel;
+ const r=await sb.from('support_messages').select('id,sender_role,sender_name,body,created_at').eq('conversation_id',id).order('created_at',{ascending:true}).limit(500);
+ if(r.error||s.sel!==id)return;
+ let added=false;for(const m of r.data||[]){if(!s.seen[m.id]){s.seen[m.id]=1;s.msgs.push(m);added=true;}}
+ if(added&&state.page==='support')renderSupportThread();
+}
+function supportTick(){const s=state.support;if(!s.started)return;loadSupportList(true);if(state.page==='support')refreshSupportThread();}
+let supportReloadTimer=null;
+function startSupport(){
+ const s=state.support;if(s.started||!sb||!state.user)return;s.started=true;
+ loadSupportList(true);
+ try{
+  sb.channel('admin-support')
+   .on('postgres_changes',{event:'INSERT',schema:'public',table:'support_messages'},p=>{
+     const m=p&&p.new;if(!m)return;
+     if(m.conversation_id===s.sel&&!s.seen[m.id]){s.seen[m.id]=1;s.msgs.push(m);if(state.page==='support')renderSupportThread();if(m.sender_role==='lounge'&&document.hasFocus())sb.rpc('nova_support_admin_read',{p_conversation_id:m.conversation_id});}
+     clearTimeout(supportReloadTimer);supportReloadTimer=setTimeout(()=>loadSupportList(true),350);
+   })
+   .on('postgres_changes',{event:'*',schema:'public',table:'support_conversations'},()=>{clearTimeout(supportReloadTimer);supportReloadTimer=setTimeout(()=>loadSupportList(true),350);})
+   .subscribe();
+ }catch(e){console.warn('Support realtime:',e);}
+}
+function renderSupportList(){
+ const s=state.support,box=$('supList');if(!box)return;
+ document.querySelectorAll('[data-supf]').forEach(b=>b.classList.toggle('on',b.dataset.supf===s.filter));
+ const rows=supportSorted();
+ box.innerHTML=rows.length?rows.map(c=>`<div class="sup-item${c.id===s.sel?' sel':''}${c.unread_admin?' unread':''}" data-sup-open="${esc(c.id)}"><div class="top"><b>${esc(c.lounge_name||'Lounge')}</b><span>${c.unread_admin?`<span class="sup-dot">${c.unread_admin}</span> `:''}<span class="muted small">${esc(agoLabel(c.last_message_at))}</span></span></div><div class="who">${esc(c.requester_name||'Customer')} · ${esc(c.requester_role||'')}${c.status==='resolved'?' · resolved':''}</div><div class="pv">${c.last_sender_role==='admin'?'You: ':''}${esc(c.last_message_preview||'')}</div></div>`).join(''):`<div class="sup-empty">${s.filter==='open'?'No open conversations. 🎉':'Nothing here.'}</div>`;
+}
+function renderSupportThread(keepScroll){
+ const s=state.support,box=$('supThread');if(!box)return;
+ const c=s.convos.find(x=>x.id===s.sel);
+ if(!c){box.innerHTML='<div class="sup-empty">Select a conversation on the left to read and reply.</div>';return;}
+ const lounge=getLounge(c.lounge_id);
+ const old=$('supMsgs'),atBottom=!old||old.scrollHeight-old.scrollTop-old.clientHeight<80;
+ let last='';
+ const msgs=s.msgs.slice().sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)).map(m=>{const d=dayLabel(m.created_at);const sep=d!==last?`<div class="sup-day">${esc(d)}</div>`:'';last=d;return sep+`<div class="sup-b ${m.sender_role==='admin'?'out':'in'}">${esc(m.body)}<time>${esc(hhmm(m.created_at))}${m.sender_role==='admin'?' · Nova Support':''}</time></div>`;}).join('');
+ const draft=$('supInput')?$('supInput').value:s.draft;
+ box.innerHTML=`<div class="sup-head"><h3>${esc(c.lounge_name||'Lounge')} <span class="pill ${c.status==='resolved'?'':'upgrade'}">${c.status==='resolved'?'Resolved':'Open'}</span></h3><div class="sup-info"><div><span>Name</span>${esc(c.requester_name||'—')}</div><div><span>Email</span>${c.requester_email?`<a href="mailto:${esc(c.requester_email)}">${esc(c.requester_email)}</a>`:'—'}</div><div><span>Lounge</span>${esc(c.lounge_name||'—')}</div><div><span>Role</span>${esc(c.requester_role||'—')}</div><div><span>Lounge status</span>${esc(lounge?.status||'—')}</div></div><div class="sup-actions">${lounge?`<button class="btn" data-sup-lounge="${esc(c.lounge_id)}">View lounge</button>`:''}<button class="btn" data-sup-status="${c.status==='resolved'?'open':'resolved'}">${c.status==='resolved'?'Reopen':'Mark resolved'}</button></div></div><div class="sup-msgs" id="supMsgs">${msgs||'<div class="sup-empty">No messages yet.</div>'}</div><form class="sup-form" id="supForm"><textarea id="supInput" class="field" maxlength="2000" placeholder="Write a reply… (Enter to send, Shift+Enter for a new line)"></textarea><button class="btn green" id="supSend" type="submit">Send</button></form>`;
+ const ta=$('supInput');ta.value=draft||'';
+ ta.addEventListener('input',()=>{s.draft=ta.value;});
+ ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendSupportReply();}});
+ $('supForm').addEventListener('submit',e=>{e.preventDefault();sendSupportReply();});
+ const mb=$('supMsgs');if(mb&&(atBottom||!keepScroll))mb.scrollTop=mb.scrollHeight;
+}
+async function openSupportConvo(id){
+ const s=state.support;s.sel=id;s.msgs=[];s.seen={};s.draft='';renderSupportList();renderSupportThread();
+ const r=await sb.from('support_messages').select('id,sender_role,sender_name,body,created_at').eq('conversation_id',id).order('created_at',{ascending:true}).limit(500);
+ if(s.sel!==id)return;
+ if(r.error){toast('Could not load messages: '+fmtError(r.error));return;}
+ s.msgs=r.data||[];s.msgs.forEach(m=>s.seen[m.id]=1);renderSupportThread();
+ const c=s.convos.find(x=>x.id===id);
+ if(c&&c.unread_admin){c.unread_admin=0;s.unread=s.convos.reduce((n,x)=>n+(x.unread_admin||0),0);updateSupportBadge();renderSupportList();sb.rpc('nova_support_admin_read',{p_conversation_id:id});}
+ setTimeout(()=>{const t=$('supInput');if(t)t.focus();},40);
+}
+async function sendSupportReply(){
+ const s=state.support,ta=$('supInput');if(!ta||!s.sel||s.sending)return;
+ const body=ta.value.trim();if(!body)return;
+ s.sending=true;const btn=$('supSend');if(btn)btn.disabled=true;
+ try{
+  const r=await sb.rpc('nova_support_reply',{p_conversation_id:s.sel,p_body:body});
+  if(r.error)throw r.error;
+  ta.value='';s.draft='';
+  const id=r.data&&r.data.message_id;
+  if(id&&!s.seen[id]){s.seen[id]=1;s.msgs.push({id,sender_role:'admin',sender_name:'Nova Support',body,created_at:(r.data&&r.data.created_at)||new Date().toISOString()});}
+  const c=s.convos.find(x=>x.id===s.sel);if(c){c.last_message_preview=body.slice(0,140);c.last_sender_role='admin';c.last_message_at=new Date().toISOString();}
+  renderSupportList();renderSupportThread();
+ }catch(e){toast('Reply failed: '+fmtError(e));}
+ finally{s.sending=false;const b=$('supSend');if(b)b.disabled=false;const t=$('supInput');if(t)t.focus();}
+}
+async function setSupportStatus(status){
+ const s=state.support;if(!s.sel)return;
+ const r=await sb.rpc('nova_support_set_status',{p_conversation_id:s.sel,p_status:status});
+ if(r.error){toast('Could not update: '+fmtError(r.error));return;}
+ const c=s.convos.find(x=>x.id===s.sel);if(c)c.status=status;
+ if(status==='resolved'&&s.filter==='open'){s.sel=null;s.msgs=[];}
+ renderSupportList();renderSupportThread();toast(status==='resolved'?'Conversation marked resolved.':'Conversation reopened.');
+}
+function renderSupport(){
+ const s=state.support;
+ if(s.err==='setup'){$('content').innerHTML='<section class="card empty">Live chat is not set up yet. Run <b>support_chat.sql</b> in the Supabase SQL editor, then reload this page.</section>';return;}
+ if(s.err){$('content').innerHTML='<section class="card empty">Could not load support chats: '+esc(s.err)+'</section>';return;}
+ $('content').innerHTML=`<div class="sup-wrap"><aside class="card sup-side"><div class="sup-tabs"><button data-supf="open">Open</button><button data-supf="resolved">Resolved</button><button data-supf="all">All</button></div><div id="supList"></div></aside><section class="card sup-main" id="supThread"></section></div>`;
+ document.querySelectorAll('[data-supf]').forEach(b=>b.addEventListener('click',()=>{s.filter=b.dataset.supf;renderSupportList();}));
+ $('supList').addEventListener('click',e=>{const it=e.target.closest('[data-sup-open]');if(it)openSupportConvo(it.dataset.supOpen);});
+ $('supThread').addEventListener('click',e=>{
+  const l=e.target.closest('[data-sup-lounge]');if(l){openLoungeProfile(l.dataset.supLounge);return;}
+  const st=e.target.closest('[data-sup-status]');if(st)setSupportStatus(st.dataset.supStatus);
+ });
+ renderSupportList();renderSupportThread();
+ if(!s.loaded||Date.now()-s.at>15000)loadSupportList(true);
 }
 function openLoungeProfile(id){
  const l=getLounge(id);if(!l)return;const s=latestFor(id);const history=state.subs.filter(x=>x.lounge_id===id).sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
@@ -223,23 +401,21 @@ function renderSettings(){
 function render(){
  const t=titles[state.page]||titles.overview;$('pageTitle').textContent=t[0];$('pageSubtitle').textContent=t[1];
  document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('active',b.dataset.page===state.page));
- if(state.page==='overview')renderOverview();else if(state.page==='payments')renderPayments();else if(state.page==='lounges')renderLounges();else if(state.page==='subscriptions')renderSubs();else if(state.page==='analytics')renderAnalytics();else if(state.page==='reports')renderReports();else if(state.page==='audit')renderAudit();else renderSettings();
+ if(state.page==='overview')renderOverview();else if(state.page==='payments')renderPayments();else if(state.page==='lounges')renderLounges();else if(state.page==='subscriptions')renderSubs();else if(state.page==='analytics')renderAnalytics();else if(state.page==='reports')renderReports();else if(state.page==='audit')renderAudit();else if(state.page==='support')renderSupport();else renderSettings();
 }
 function downloadCsv(filename,rows){if(!rows?.length){toast('No records to export.');return;}const keys=[...new Set(rows.flatMap(r=>Object.keys(r)))];const quote=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const csv=[keys.map(quote).join(','),...rows.map(r=>keys.map(k=>quote(r[k])).join(','))].join('\r\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();URL.revokeObjectURL(a.href);toast('CSV export generated.');}
 function exportPayments(){downloadCsv('nova-payment-submissions.csv',state.payments.map(p=>({...p,lounge_name:getLounge(p.lounge_id)?.name||''})));}
 $('nav').addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(!b)return;state.page=b.dataset.page;$('sidebar').classList.remove('open');render();});
-$('adminNav').addEventListener('click',e=>{const b=e.target.closest('[data-page]');if(!b)return;state.page=b.dataset.page;$('sidebar').classList.remove('open');render();});
 $('refreshBtn').addEventListener('click',loadAll);$('dateRange').addEventListener('change',e=>{state.range=e.target.value;loadAll();});
 $('globalSearch').addEventListener('input',e=>{state.search=e.target.value;if(['payments','lounges','subscriptions'].includes(state.page))render();});
-const themeToggle=$('themeToggle');function applyTheme(dark){document.body.classList.toggle('dark-theme',dark);themeToggle.textContent=dark?'☀ Light mode':'☾ Dark mode';themeToggle.setAttribute('aria-pressed',String(dark));themeToggle.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');}let savedTheme='light';try{savedTheme=localStorage.getItem('nova-admin-theme')||'light';}catch(_){}applyTheme(savedTheme==='dark');themeToggle.addEventListener('click',()=>{const dark=!document.body.classList.contains('dark-theme');applyTheme(dark);try{localStorage.setItem('nova-admin-theme',dark?'dark':'light');}catch(_){}});
 $('menuBtn').addEventListener('click',()=>$('sidebar').classList.toggle('open'));
 $('exportBtn').addEventListener('click',()=>{if(state.page==='payments')exportPayments();else if(state.page==='lounges')downloadCsv('nova-lounges.csv',state.lounges);else if(state.page==='subscriptions')downloadCsv('nova-subscriptions.csv',state.subs);else if(state.page==='analytics')downloadCsv('nova-payment-analytics.csv',state.payments);else exportPayments();});
 $('content').addEventListener('click',async e=>{
- const kpiBtn=e.target.closest('[data-kpi-target]');if(kpiBtn){const dest=kpiBtn.dataset.kpiTarget;state.search='';if(dest===state.page){const tableEl=document.querySelector('#content .tablewrap')||document.querySelector('#content section.card');if(tableEl)tableEl.scrollIntoView({behavior:'smooth',block:'start'});else toast('This metric is shown in the current tab.');}else{state.page=dest;render();window.scrollTo({top:0,behavior:'smooth'});}return;}
+ const kpiBtn=e.target.closest('[data-kpi-target]');if(kpiBtn){state.search='';state.page=kpiBtn.dataset.kpiTarget;render();window.scrollTo({top:0,behavior:'smooth'});return;}
  const loungeBtn=e.target.closest('[data-view-lounge]');if(loungeBtn){openLoungeProfile(loungeBtn.dataset.viewLounge);return;}
  const go=e.target.closest('[data-goto]');if(go){state.page=go.dataset.goto;render();return;}
  const exp=e.target.closest('[data-export]');if(exp){const k=exp.dataset.export;const rows=k==='lounges'?state.lounges:k==='subscriptions'?state.subs:k==='mpesa'?state.mpesa:state.payments;downloadCsv('nova-'+k+'.csv',rows);return;}
- const review=e.target.closest('[data-view-payment]');if(review){const p=state.payments.find(x=>x.id===review.dataset.viewPayment);if(!p)return;const l=getLounge(p.lounge_id);const choice=prompt(`Payment review\nLounge: ${l?.name||p.lounge_id}\nAmount: ${money(p.amount_kes)}\nMethod: ${p.payment_method||'—'}\nReference: ${p.reference_code||'—'}\nStatus: ${p.status}\n\nType APPROVE or REJECT. Verify the provider receipt before approving.`);if(!choice)return;const decision=choice.trim().toLowerCase();if(!['approve','reject'].includes(decision)){toast('No change made. Type APPROVE or REJECT.');return;}if(decision==='approve'&&!confirm('Confirm you verified this payment with the payment provider and want the backend to activate the subscription?'))return;const note=prompt('Optional admin note / rejection reason:')||null;review.disabled=true;review.textContent='Working…';try{const {data,error}=await sb.functions.invoke('review-payment',{body:{payment_id:p.id,decision,admin_note:note}});if(error)throw error;if(data?.error)throw new Error(data.error);toast(decision==='approve'?'Approval request processed by backend.':'Rejection request processed by backend.');await loadAll();}catch(err){toast('Review failed: '+fmtError(err));review.disabled=false;review.textContent='Review';}}
+ const review=e.target.closest('[data-view-payment]');if(review){openPaymentReview(review.dataset.viewPayment);return;}
 });
 document.addEventListener('click',e=>{if(e.target.closest('[data-export]'))return;if(e.target.closest('[data-close-detail]')){closeLoungeProfile();return;}if(e.target.id==='detailOverlay')closeLoungeProfile();});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLoungeProfile();});
 if(sb)sb.auth.getSession().then(async({data,error})=>{if(error){showLogin(fmtError(error));return;}if(data.session)await enter(data.session.user);else showLogin();}).catch(e=>showLogin(fmtError(e)));
