@@ -4,39 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Nova Multi-Lounge — Sign-in, Onboarding & Dashboard Preview</title>
-<script id="nova-theme-switch-js">
-(function(){
-var KEY='nova_multilounge_theme';
-var MOON='<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>';
-var SUN='<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
-try{var t=localStorage.getItem(KEY);if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)}catch(e){}
-window.novaCurrentTheme=function(){
-  var a=document.documentElement.getAttribute('data-theme');
-  if(a==='dark'||a==='light')return a;
-  return(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
-};
-window.novaThemeToggleInner=function(){var d=novaCurrentTheme()==='dark';return(d?SUN:MOON)+(d?'Light mode':'Dark mode')};
-window.novaThemeToggleHTML=function(){
-  var d=novaCurrentTheme()==='dark';
-  return '<a tabindex="0" role="button" data-theme-toggle aria-pressed="'+d+'" title="Switch to '+(d?'light':'dark')+' mode">'+novaThemeToggleInner()+'</a>';
-};
-window.novaSetTheme=function(t){
-  t=(t==='dark')?'dark':'light';
-  document.documentElement.setAttribute('data-theme',t);
-  try{localStorage.setItem(KEY,t)}catch(e){}
-  var els=document.querySelectorAll('[data-theme-toggle]');
-  for(var i=0;i<els.length;i++){els[i].innerHTML=novaThemeToggleInner();els[i].setAttribute('aria-pressed',String(t==='dark'));els[i].title='Switch to '+(t==='dark'?'light':'dark')+' mode'}
-  try{window.dispatchEvent(new CustomEvent('nova-theme-change',{detail:t}))}catch(e){}
-};
-window.novaToggleTheme=function(){novaSetTheme(novaCurrentTheme()==='dark'?'light':'dark')};
-document.addEventListener('keydown',function(e){
-  if(e.key!=='Enter'&&e.key!==' ')return;
-  var el=e.target&&e.target.closest?e.target.closest('[data-theme-toggle]'):null;
-  if(!el)return;e.preventDefault();novaToggleTheme();
-});
-})();
-</script>
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#ebe3da;--card:#fff;--side:#f7f4f0;--ink:#161513;--mute:#8a847c;--line:#ece6df;--green:#2d5a43;--greenbg:#e8f1ea;--bar:#b9c9bc;--warn:#b5651d;--warnbg:#fdf8ee;--red:#c0392b;--blue:#4a4fd8;--sel:#e6e8e6;--amber:#fbe9b7;
@@ -279,26 +246,6 @@ main{padding:28px 30px 70px;overflow:auto}.wrap{max-width:1440px;display:grid;gr
 @media(max-width:380px){#publicTournamentView .tournament-stats{grid-template-columns:1fr}#publicTournamentView tbody tr{grid-template-columns:minmax(0,1fr)}#publicTournamentView tbody td{border-bottom:1px solid var(--line,#d8dee4)!important}#publicTournamentView tbody td:last-child{border-bottom:0!important}}
 </style>
 
-<style id="nova-theme-switch">
-:root{color-scheme:light}
-:root[data-theme="dark"]{color-scheme:dark}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark}}
-body,.side,.card,.dlg,.btn,.tabs,.bay,nav a{transition:background-color .2s,color .2s,border-color .2s}
-.foot a[data-theme-toggle]{user-select:none}
-.foot a:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
-/* Active tab + toast: were fixed near-black with white text */
-:root[data-theme="dark"] .tabs button.on{background:var(--green);color:#08140e}
-:root[data-theme="dark"] .toast{background:#eef4f1;color:#11171a}
-:root[data-theme="dark"] .bay.on{border-color:#2c5a45}
-:root[data-theme="dark"] .bay.un{border-color:#5a4716}
-:root[data-theme="dark"] .bay.on b:before,:root[data-theme="dark"] .bay.op b:before,:root[data-theme="dark"] .bay.un b:before{color:#4b5a55}
-@media(prefers-color-scheme:dark){
-:root:not([data-theme="light"]) .tabs button.on{background:var(--green);color:#08140e}
-:root:not([data-theme="light"]) .toast{background:#eef4f1;color:#11171a}
-:root:not([data-theme="light"]) .bay.on{border-color:#2c5a45}
-:root:not([data-theme="light"]) .bay.un{border-color:#5a4716}
-}
-</style>
 </head>
 <body>
 <aside class="side" id="side">
@@ -398,7 +345,7 @@ function toast(m){var e=$('toast');e.textContent=m;e.classList.add('show');clear
 var KEY={'Dashboard':'dash','Reports':'reports','Shifts':'shifts','Monitoring':'monitoring','Consoles':'consoles','Games':'games','Products':'products','Staff':'staff','Tournaments':'tournaments','Cash Outs':'cashouts','Debts':'debts','Expenses':'expenses','Income':'income','Refer & Earn':'refer'};
 function cop(){return DB.cashouts.filter(function(r){return r.status=='Pending'}).length}
 function nav(){$('nav').innerHTML=NAV.map(function(g){return '<h6>'+g[0]+'</h6>'+g[1].map(function(i){var k=KEY[i[0]],b=k=='shifts'?DB.shifts.filter(function(r){return r.status=='Open'}).length:k=='cashouts'?cop():0;return '<a tabindex="0" data-pg="'+k+'" class="'+(k==cur?'on':'')+'">'+svg(i[1])+i[0]+(b?'<b>'+b+'</b>':'')+'</a>'}).join('')}).join('');
-$('foot').innerHTML=svgl('Help & Guides','help','data-guides')+svgl('Settings','gear','data-pg="settings"')+novaThemeToggleHTML()+svgl('Sign out','out','data-out')}
+$('foot').innerHTML=svgl('Help & Guides','help','data-guides')+svgl('Settings','gear','data-pg="settings"')+svgl('Sign out','out','data-out')}
 function svgl(n,i,a){return '<a tabindex="0" '+a+'>'+svg(i)+n+'</a>'}
 function stats(){var p=st.per||'today',r=revenueStats(p),today=revenueStats('today'),todayIndex=(new Date().getDay()+6)%7;$('debt').textContent=f(DB.debts.filter(function(x){return x.status!='Paid'}).reduce(function(a,x){return a+(x.remaining_amount==null?(+x.amount||0):(+x.remaining_amount||0))},0));var labels={today:'Today',yest:'Yesterday',week:'This Week'};$('rl').textContent=labels[p]||'Today';$('rv').textContent=f(r.rev);$('ss').textContent=r.s;$('sp').textContent=r.paid;$('co').textContent=f(r.co);$('cp').innerHTML=p=='today'&&cop()?'<a style="color:var(--warn);cursor:pointer" data-cash>'+cop()+' to review →</a>':'';$('cash').textContent=f(r.cash);$('mp').textContent=f(r.mp);$('bank').textContent=f(r.co);$('daylabels').innerHTML=['MON','TUE','WED','THU','FRI','SAT','SUN'].map(function(d,i){return '<span class="'+(i==todayIndex?'today':'')+'">'+d+'</span>'}).join('');var change=p=='today'?today.rev:0;$('dn').innerHTML='<span class="dn">'+(r.s?'↑ ':'↓ ')+' '+r.s+' sessions <em>'+((r.s||0)+' recorded')+'</em></span>';$('pace').innerHTML=p=='today'?'On pace for ~ <b>Ksh '+f(Math.max(0,Math.round(change*1.86/50)*50))+'</b> · '+remainingToday()+' remaining today':'Revenue from '+labels[p].toLowerCase()+' · <b>Ksh '+f(r.rev)+'</b>';V=lastSevenDays();var tot=V.reduce(function(a,b){return a+b},0);$('avg').textContent=f(Math.round(tot/7));$('bars').innerHTML=V.map(function(v,i){var sel=p=='week'||(p=='yest'&&i==(todayIndex+6)%7)||(p=='today'&&i==todayIndex);return '<div class="'+(sel?'sel ':'')+(i==todayIndex?'today':'')+'" data-v="'+(v/1000).toFixed(1)+'k" style="height:'+Math.max(8,v/78)+'%" title="Ksh '+f(v)+'"></div>'}).join('')}
 function billFor(b){return Math.max(st.rate,Math.ceil(elapsedSec(b)/1800)*st.rate)}
@@ -487,7 +434,7 @@ if(q('data-cfg')){
   }
   return
 }
-if(q('data-theme-toggle')){novaToggleTheme();return}if(q('data-out')){signOutNova();return}
+if(q('data-out')){signOutNova();return}
 if(q('data-bays')){var bb={};paidBayNumbers().forEach(function(n){var el=$('ba'+n),v=el?el.value.trim():'';if(v)bb[n]=v});fetch('api/config',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bays:bb})}).then(function(r){return r.json().then(function(j){if(!r.ok)throw j;return j})}).then(function(j){cfgB=j.bays;toast('Accounts saved. Checking consoles…')}).catch(function(j){toast(j&&j.error||'Could not save')});return}
 if(q('data-reset')){if(!currentUser){toast('Sign in first to reset cloud sales');return}if(!confirm('Reset all test sales/transactions and related local totals? This cannot be undone. Bay names, games, staff, products and settings will stay.'))return;(async function(){try{var r=await sb.from('transactions').delete().not('id','is',null);if(r.error)throw r.error;DB.sessions=[];st.rev=0;st.sess=0;st.cash=0;st.mp=0;st.co=0;st.cop=0;V=[0,0,0,0,0,0,0];await sb.from('app_state').upsert({id:1,state:{st:st,DB:DB},updated_at:new Date().toISOString()},{onConflict:'id'});all();go('settings');toast('Sales data reset to zero');}catch(e){console.error(e);toast('Reset failed: '+(e.message||e))}})();return}
 if(x=q('data-quick')){var z=x.dataset.quick;if(z=='start'){var oi=st.bays.findIndex(function(b){return b.s=='op'||b.s=='un'});if(oi<0){toast('All bays are currently occupied');}else pick(oi);return}if(z=='sale'){go('income');setTimeout(function(){form('income')},0);return}if(z=='expense'){go('expenses');setTimeout(function(){form('expenses')},0);return}if(z=='tournament'){go('tournaments');setTimeout(novaTournamentForm,0);return}if(z=='history'){go('history');return}}
@@ -1058,11 +1005,9 @@ if(MULTILOUNGE_SETUP_REQUIRED){
   try { novaTheme = localStorage.getItem('nova_multilounge_theme') || 'light'; } catch (_) {}
   const applyNovaTheme = () => {
     if (novaGate) novaGate.setAttribute('data-theme', novaTheme);
-    document.documentElement.setAttribute('data-theme', novaTheme);
     if (novaThemeButton) { novaThemeButton.textContent = novaTheme === 'dark' ? '☀ Light mode' : '☾ Dark mode'; novaThemeButton.setAttribute('aria-pressed', String(novaTheme === 'dark')); }
   };
   applyNovaTheme();
-  window.addEventListener('nova-theme-change', (e) => { novaTheme = e.detail; applyNovaTheme(); });
   if (novaThemeButton) novaThemeButton.addEventListener('click', () => {
     novaTheme = novaTheme === 'dark' ? 'light' : 'dark';
     try { localStorage.setItem('nova_multilounge_theme', novaTheme); } catch (_) {}
@@ -1340,7 +1285,7 @@ if(MULTILOUNGE_SETUP_REQUIRED){
  consoleSlider?.addEventListener('input',updateNovaPrice);
  updateNovaPrice();
 
- applyTheme(); window.addEventListener('nova-theme-change',function(e){theme=e.detail;applyTheme()}); themeBtn?.addEventListener('click',function(){theme=theme==='dark'?'light':'dark';try{localStorage.setItem('nova_multilounge_theme',theme)}catch(e){}applyTheme()});
+ applyTheme(); themeBtn?.addEventListener('click',function(){theme=theme==='dark'?'light':'dark';try{localStorage.setItem('nova_multilounge_theme',theme)}catch(e){}applyTheme()});
  landing.querySelectorAll('[data-nova-scroll]').forEach(b=>b.addEventListener('click',()=>document.getElementById(b.dataset.novaScroll)?.scrollIntoView({behavior:'smooth'})));
  landing.querySelectorAll('[data-nova-enter]').forEach(b=>b.addEventListener('click',()=>{const signup=b.dataset.novaEnter==='signup';const syncAuthTheme=()=>{applyTheme();let panel=document.querySelector('#novaAuthPanel');if(panel&&!panel.querySelector('.nova-auth-theme')){let top=document.createElement('div');top.className='nova-auth-top';top.innerHTML='<div style="font-weight:900;font-size:19px;letter-spacing:-.5px">Nova <span style="color:var(--na-accent)">Multi-Lounge</span></div><button class="nova-auth-theme" type="button">☾ <span>Dark mode</span></button>';panel.prepend(top);top.querySelector('button').addEventListener('click',()=>{theme=theme==='dark'?'light':'dark';applyTheme()})}};let gate=document.querySelector('.nova-gate');if(gate){if(landing.contains(gate))document.body.appendChild(gate);landing.style.display='none';gate.style.display='flex';gate.style.position='relative';gate.style.zIndex='1000001';gate.scrollIntoView({behavior:'auto',block:'start'});syncAuthTheme();const target=document.getElementById(signup?'novaShowSignup':'novaShowLogin');if(target)target.click();return;}const auth=document.getElementById('novaAuthPanel');if(auth){landing.style.display='none';auth.style.display='block';auth.scrollIntoView({behavior:'auto',block:'center'});syncAuthTheme();const target=document.getElementById(signup?'novaShowSignup':'novaShowLogin');if(target)target.click();return;}const login=document.getElementById('cloudLogin');if(login){landing.style.display='none';login.style.display='flex';login.scrollIntoView({behavior:'auto',block:'start'});return;}alert('The Nova sign-in panel could not be found. Please refresh the page and try again.');}));
  const demoBtn=document.getElementById('novaTryDemo');
